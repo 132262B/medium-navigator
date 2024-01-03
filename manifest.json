@@ -5,7 +5,7 @@
   "manifest_version": 3,
   "content_scripts": [
     {
-      "matches": ["https://medium.com/*"],
+      "matches": ["https://medium.com/*/*"],
       "js": ["index.js"]
     }
   ],
