@@ -1,12 +1,6 @@
 function createFloatingDiv(navigation) {
     const floatingDiv = document.createElement('div');
-    floatingDiv.style.width='250px'
-    floatingDiv.style.position = 'fixed';
-    floatingDiv.style.left = '80%'; // 요소의 오른쪽에 위치
-    floatingDiv.style.top = '50%';
-    //floatingDiv.style.backgroundColor = 'yellow';
-    floatingDiv.style.padding = '10px';
-    floatingDiv.style.border = '1px solid black';
+    floatingDiv.className = 'navigation-box'
     floatingDiv.innerHTML = navigation;
     return floatingDiv;
 }
@@ -30,7 +24,7 @@ function checkAndLogElement() {
                         let hTags = element.querySelectorAll('h1, h2, h3, h4');
                         hTags.forEach(tag => {
                             if (tag.id) {
-                                navigation += `<a href="#${tag.id}">${tag.textContent}</a><br>`;
+                                navigation += `<a href="#${tag.id}" class="navigation-link navigation-link-${tag.tagName.toLowerCase()}">${tag.textContent}</a><br>`;
                             } else {
                                 // id 속성이 없는 경우, 단순히 텍스트만 추가합니다.
                                 navigation += `${tag.textContent}<br>`;
