@@ -1,24 +1,15 @@
 .navigation-box {
     width: 250px;
     position: fixed;
-    top: 50%;
+    top: 40%;
     left: 80%;
 
     color: #868e96;
     font-size: 12px;
-    padding: 10px;
-}
-
-.navigation-box a {
-    margin-bottom: 30px;
 }
 
 .navigation-link-h2 {
     margin-left: 9px;
-}
-
-.navigation-link-h3 {
-    margin-left: 12px;
 }
 
 .navigation-link:hover {

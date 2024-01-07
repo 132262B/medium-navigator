@@ -1,57 +1,62 @@
-function createFloatingDiv(navigation) {
-    const floatingDiv = document.createElement('div');
-    floatingDiv.className = 'navigation-box'
-    floatingDiv.innerHTML = navigation;
-    return floatingDiv;
-}
+class Navigator {
 
-function getElementByXpath(path) {
-    return document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-}
+    static _createFloatingDiv(navigation) {
+        const floatingDiv = document.createElement('div');
+        floatingDiv.className = 'navigation-box';
+        floatingDiv.innerHTML = navigation;
+        return floatingDiv;
+    }
 
-function checkAndLogElement() {
-    for (let i1 = 1; i1 <= 5; i1++) {
-        for (let i2 = 1; i2 <= 5; i2++) {
-            for (let i3 = 1; i3 <= 5; i3++) {
-                for (let i4 = 1; i4 <= 5; i4++) {
-                    // 다른 인덱스에 대해 추가 반복문을 여기에 삽입할 수 있습니다.
+    static _getElementXpath(path) {
+        return document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+    }
+
+    static _selectXpath() {
+        for (let i1 = 1; i1 <= 5; i1++) {
+            for (let i2 = 1; i2 <= 5; i2++) {
+                for (let i3 = 1; i3 <= 5; i3++) {
                     const xpath = `//*[@id="root"]/div/div[${i1}]/div[${i2}]/div[${i3}]/article/div/div/section`;
-                    const element = getElementByXpath(xpath);
+                    const element = this._getElementXpath(xpath);
 
                     if (element) {
-                        //alert(element.textContent);
-                        let navigation = ''
-                        let hTags = element.querySelectorAll('h1, h2, h3, h4');
-                        hTags.forEach(tag => {
-                            if (tag.id) {
-                                navigation += `<a href="#${tag.id}" class="navigation-link navigation-link-${tag.tagName.toLowerCase()}">${tag.textContent}</a><br>`;
-                            } else {
-                                // id 속성이 없는 경우, 단순히 텍스트만 추가합니다.
-                                navigation += `${tag.textContent}<br>`;
-                            }
-                            //alert(tag.tagName + " content: " + tag.textContent);
-                        });
-
-                        // 새로운 floating div를 생성하고 요소 옆에 추가합니다.
-                        const newDiv = createFloatingDiv(navigation);
-                        element.parentElement.appendChild(newDiv);
-                        //observer.disconnect();
-                        break; // 요소를 찾았으면 더 이상의 탐색을 중지합니다.
+                        return element;
                     }
                 }
             }
         }
     }
+
+    static _createNavigationLinkElement(tag) {
+        return `
+                <a href="#${tag.id}" class="navigation-link navigation-link-${tag.tagName.toLowerCase()}">${tag.textContent}</a><br>
+        `;
+    }
+
+    static init() {
+        const element = this._selectXpath();
+
+        if (!element) return;
+
+        let navigation = '';
+        const hTags = element.querySelectorAll('h1, h2');
+        hTags.forEach(tag => {
+            if (tag.id) {
+                navigation += this._createNavigationLinkElement(tag);
+            }
+        });
+
+        const newDiv = this._createFloatingDiv(navigation);
+        element.parentElement.appendChild(newDiv);
+    }
+
 }
 
-//
-// // MutationObserver를 설정합니다.
-// const observer = new MutationObserver(checkAndLogElement);
-//
-// // Observer 구성 옵션
-// const config = {childList: true, subtree: true};
-//
-// // Observer를 문서의 바디에 연결합니다.
-// observer.observe(document.body, config);
+//Navigator.init();
 
-checkAndLogElement()
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === "init") {
+        setTimeout(()=> {
+            Navigator.init();
+        }, 1000);
+    }
+});
