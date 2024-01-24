@@ -1,43 +1,85 @@
 'use strict';
 
-// Content script file will run in the context of web page.
-// With content script you can manipulate the web pages using
-// Document Object Model (DOM).
-// You can also pass information to the parent extension.
+class Navigator {
 
-// We execute this script by making an entry in manifest.json file
-// under `content_scripts` property
-
-// For more information on Content Scripts,
-// See https://developer.chrome.com/extensions/content_scripts
-
-// Log `title` of current active web page
-const pageTitle = document.head.getElementsByTagName('title')[0].innerHTML;
-console.log(
-  `Page title is: '${pageTitle}' - evaluated by Chrome extension's 'contentScript.js' file`
-);
-
-// Communicate with background file by sending a message
-chrome.runtime.sendMessage(
-  {
-    type: 'GREETINGS',
-    payload: {
-      message: 'Hello, my name is Con. I am from ContentScript.',
-    },
-  },
-  (response) => {
-    console.log(response.message);
+  static _createFloatingDiv(navigation) {
+    const floatingDiv = document.createElement('div');
+    floatingDiv.className = 'navigation-box';
+    floatingDiv.innerHTML = navigation;
+    return floatingDiv;
   }
-);
 
-// Listen for message
+  static _getElementXpath(path) {
+    return document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+  }
+
+  static _selectXpath() {
+    for (let i1 = 1; i1 <= 5; i1++) {
+      for (let i2 = 1; i2 <= 5; i2++) {
+        for (let i3 = 1; i3 <= 5; i3++) {
+          const xpath = `//*[@id="root"]/div/div[${i1}]/div[${i2}]/div[${i3}]/article/div/div/section`;
+          const element = this._getElementXpath(xpath);
+
+          if (element) {
+            return element;
+          }
+        }
+      }
+    }
+  }
+
+  static _createNavigationLinkElement(tag) {
+    return `
+                <a href="#${tag.id}" class="navigation-link navigation-link-${tag.tagName.toLowerCase()}">${tag.textContent}</a><br>
+        `;
+  }
+
+  static init() {
+    const element = this._selectXpath();
+
+    if (!element) return;
+
+    let navigation = '';
+    const hTags = element.querySelectorAll('h1, h2');
+    hTags.forEach(tag => {
+      if (tag.id) {
+        navigation += this._createNavigationLinkElement(tag);
+      }
+    });
+
+    const newDiv = this._createFloatingDiv(navigation);
+    element.parentElement.appendChild(newDiv);
+  }
+}
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.type === 'COUNT') {
-    console.log(`Current count is ${request.payload.count}`);
+  if (request.action === "init") {
+    setTimeout(()=> {
+      Navigator.init();
+    }, 1000);
   }
-
-  // Send an empty response
-  // See https://github.com/mozilla/webextension-polyfill/issues/130#issuecomment-531531890
-  sendResponse({});
-  return true;
 });
+
+// chrome.runtime.sendMessage(
+//   {
+//     type: 'GREETINGS',
+//     payload: {
+//       message: 'Hello, my name is Con. I am from ContentScript.',
+//     },
+//   },
+//   (response) => {
+//     console.log(response.message);
+//   }
+// );
+//
+// // Listen for message
+// chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+//   if (request.type === 'COUNT') {
+//     console.log(`Current count is ${request.payload.count}`);
+//   }
+//
+//   // Send an empty response
+//   // See https://github.com/mozilla/webextension-polyfill/issues/130#issuecomment-531531890
+//   sendResponse({});
+//   return true;
+// });
