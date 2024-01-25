@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Medium Navigator",
   "version": "1.0.0",
-  "description": "My Chrome Extension",
+  "description": "Streamline Your Medium Reading with Easy Navigation! Add this extension for quick, effortless browsing across articles, enhancing your Medium experience.",
   "icons": {
     "16": "icons/icon-16.png",
     "32": "icons/icon-32.png",
