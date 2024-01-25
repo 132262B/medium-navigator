@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Medium Navigator",
   "version": "1.0.0",
-  "description": "Streamline Your Medium Reading with Easy Navigation! Add this extension for quick, effortless browsing across articles, enhancing your Medium experience.",
+  "description": "Enhance Medium with our extension: Quick, easy navigation for a smoother reading experience!",
   "icons": {
     "16": "icons/icon-16.png",
     "32": "icons/icon-32.png",
@@ -12,11 +12,6 @@
   "background": {
     "service_worker": "background.js"
   },
-  "permissions": [
-    "tabs",
-    "activeTab",
-    "storage"
-  ],
   "content_scripts": [
     {
       "matches": [
