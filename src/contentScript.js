@@ -35,8 +35,15 @@ class Navigator {
   }
 
   static init() {
-    const element = this._selectXpath();
+    console.log('로그 출력 확인용')
 
+    // 네비게이션이 이미 존재하면 더이상 생성되지 않습니다.
+    const navigationDomLength = document.getElementsByClassName('navigation-box').length;
+    if (navigationDomLength !== 0) {
+      return;
+    }
+
+    const element = this._selectXpath();
     if (!element) return;
 
     let navigation = '';
@@ -52,34 +59,32 @@ class Navigator {
   }
 }
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.action === "init") {
-    setTimeout(()=> {
+// chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+//   if (request.action === "init") {
+//     setTimeout(()=> {
+//       Navigator.init();
+//     }, 1000);
+//   }
+// });
+
+
+let timeout = null;
+
+const observer = new MutationObserver(mutations => {
+  // 이미 타이머가 설정된 경우, 새로운 변경사항 무시
+  if (timeout) return;
+
+  mutations.forEach(mutation => {
+    if (mutation.addedNodes.length > 0) {
       Navigator.init();
-    }, 1000);
-  }
+    }
+  });
+
+  // medium 사이트의 dom 변화가 너무 많아 부하가 발생하여 딜레이를 "1초" 추가함.
+  timeout = setTimeout(() => {
+    timeout = null;
+  }, 1000);
 });
 
-// chrome.runtime.sendMessage(
-//   {
-//     type: 'GREETINGS',
-//     payload: {
-//       message: 'Hello, my name is Con. I am from ContentScript.',
-//     },
-//   },
-//   (response) => {
-//     console.log(response.message);
-//   }
-// );
-//
-// // Listen for message
-// chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-//   if (request.type === 'COUNT') {
-//     console.log(`Current count is ${request.payload.count}`);
-//   }
-//
-//   // Send an empty response
-//   // See https://github.com/mozilla/webextension-polyfill/issues/130#issuecomment-531531890
-//   sendResponse({});
-//   return true;
-// });
+const config = { childList: true, subtree: true };
+observer.observe(document.body, config);
