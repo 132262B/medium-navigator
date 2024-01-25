@@ -20,14 +20,16 @@
   "content_scripts": [
     {
       "matches": [
-        "https://medium.com/*/*"
+        "https://medium.com/*/*",
+        "https://*.medium.com/*"
       ],
       "js": [
         "contentScript.js"
       ],
       "css": [
         "style/navigatorStyle.css"
-      ]
+      ],
+      "run_at": "document_end"
     }
   ]
 }
