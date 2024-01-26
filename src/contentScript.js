@@ -2,10 +2,13 @@
 
 import {isNavigation, findContentElement} from '/src/utils/findUtil'
 import {createNavigation} from "/src/utils/manipulationUtil";
+import {footerDetectEvent} from "/src/event/visibleEvent.js";
 
 const init = () => {
   // 네비게이션이 이미 존재하면 더이상 생성되지 않습니다.
   if (isNavigation()) return;
+
+  footerDetectEvent();
 
   const contentElement = findContentElement();
   if (!contentElement) return;
@@ -35,4 +38,3 @@ const init = () => {
   const config = {childList: true, subtree: true};
   observer.observe(document.body, config);
 })();
-
