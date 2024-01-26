@@ -1,7 +1,7 @@
 {
   "name": "medium-navigator",
-  "version": "0.1.0",
-  "description": "My Chrome Extension",
+  "version": "1.1.0",
+  "description": "Enhance Medium with our extension: Quick, easy navigation for a smoother reading experience!",
   "private": true,
   "scripts": {
     "watch": "webpack --mode=development --watch --config config/webpack.config.js",
