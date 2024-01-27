@@ -1,5 +1,5 @@
 .navigation-box {
-  display: none; /* 기본적으로 숨김 */
+  display: none;
   width: 250px;
   position: fixed;
   line-height: 1.5;
@@ -7,10 +7,16 @@
   border-left: 2px solid #f1f3f5;
   color: #868e96;
   font-size: 12px;
+
   max-height: 400px;
-  overflow: scroll;
+
+  overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: #868e96 #f1f3f5;
+  scrollbar-color: #9fa8b0 rgba(241, 243, 245, 0);
+}
+
+.navigation-box::-webkit-scrollbar {
+  width: 8px;
 }
 
 @media screen and (min-width: 1280px) {
@@ -22,7 +28,6 @@
   }
 }
 
-
 /* 나머지 스타일은 변경 없음 */
 .navigation-link-h2 {
   margin-left: 9px;
@@ -30,24 +35,6 @@
 
 .navigation-link:hover {
   color: #000000;
-}
-
-.navigation-box::-webkit-scrollbar {
-  width: 8px;
-}
-
-.navigation-box::-webkit-scrollbar-track {
-  /* background: #f1f3f5; */
-}
-
-.navigation-box::-webkit-scrollbar-thumb {
-  background-color: #868e96;
-  border-radius: 10px;
-  border: 2px solid #f1f3f5;
-}
-
-.navigation-box::-webkit-scrollbar-thumb:hover {
-  background: #6e7277;
 }
 
 .hidden {
