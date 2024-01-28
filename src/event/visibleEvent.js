@@ -1,25 +1,27 @@
-import {navigation, status} from '/src/constants/constants'
+import { navigation } from '/src/constants/constants';
+import { state } from '/src/constants/state';
+
+import { findFooterElement } from '/src/utils/findUtil';
 
 export const footerDetectEvent = () => {
 
-  if (status.hiddenFlag) {
-    status.hiddenFlag = false
-    const footer = document.querySelector('footer');
+  if (state.hiddenFlag) {
+    state.hiddenFlag = false;
+    const footer = findFooterElement();
     if (footer !== null) {
-      const footerRect = footer.getBoundingClientRect();
 
       window.addEventListener('scroll', () => {
-        const viewPort = window.scrollY
-        const navigationElement = document.querySelector(`.${navigation.className}`);
+        const footerRect = footer.getBoundingClientRect();
 
-        if (viewPort > (footerRect.top - 500)) {
-          navigationElement.classList.add('hidden');
-        } else {
-          navigationElement.classList.remove('hidden');
+        const navigationElement = document.querySelector(`.${navigation.className}`);
+        if (navigationElement !== null) {
+          if (footerRect.top < 0) {
+            navigationElement.classList.add('hidden');
+          } else {
+            navigationElement.classList.remove('hidden');
+          }
         }
       });
     }
   }
-
-
 };

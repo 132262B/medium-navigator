@@ -1,6 +1,6 @@
 'use strict';
 
-import {isNavigation, findContentElement} from '/src/utils/findUtil'
+import {isNavigation, findSectionElement} from '/src/utils/findUtil'
 import {createNavigation} from "/src/utils/manipulationUtil";
 import {footerDetectEvent} from "/src/event/visibleEvent.js";
 
@@ -10,10 +10,10 @@ const init = () => {
 
   footerDetectEvent();
 
-  const contentElement = findContentElement();
-  if (!contentElement) return;
+  const sectionElement = findSectionElement();
+  if (sectionElement === null) return;
 
-  createNavigation(contentElement);
+  createNavigation(sectionElement);
 }
 
 // MutationObserver를 사용해 페이지를 감지합니다.
