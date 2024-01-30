@@ -1,7 +1,7 @@
-import { navigation } from '/src/constants/constants';
+import { classField } from '/src/constants/constants';
 
 export const isNavigation = () => {
-  return document.getElementsByClassName(navigation.className).length !== 0;
+  return document.getElementsByClassName(classField.navigationClassName).length !== 0;
 };
 
 export const findSectionElement = () => {

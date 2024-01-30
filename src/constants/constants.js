@@ -1,4 +1,5 @@
 
-export const navigation = {
-  className : 'navigation-box',
+export const classField = {
+  navigationClassName : 'navigation-box',
+  hiddenClassName : 'hidden',
 };
