@@ -19,7 +19,7 @@ const pushNavigationContent = (tags) => {
           tag.id,
           tag.tagName.toLowerCase(),
           tag.textContent,
-          tag.getBoundingClientRect().top,
+          tag.getBoundingClientRect().top + window.scrollY,
         ),
       );
     }
@@ -31,7 +31,7 @@ const createNavigationList = () => {
 
   state.contents.forEach(content => {
     contents += `
-        <a href="#${content.tagId}" class="navigation-link navigation-link-${content.tagType.toLowerCase()}">${content.textContent}</a>
+        <a id="n-${content.tagId}" href="#${content.tagId}" class="navigation-link navigation-link-${content.tagType.toLowerCase()}">${content.textContent}</a>
         <br>
         `;
   });

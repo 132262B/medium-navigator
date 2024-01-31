@@ -40,3 +40,8 @@
 .hidden {
   display: none;
 }
+
+.active-tag {
+  color: #000000;
+  font-weight: bold;
+}
