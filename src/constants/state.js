@@ -16,3 +16,8 @@ export class NavigatorContent {
     this.scrollPosition = scrollPosition;
   }
 }
+
+export const stateReset = () => {
+  state.hiddenFlag = true
+  state.contents = []
+}

@@ -1,24 +1,28 @@
 'use strict';
 
-import {isNavigation, findSectionElement} from '/src/utils/findUtil'
-import {createNavigation} from "/src/utils/manipulationUtil";
+import { isNavigation, findSectionElement } from '/src/utils/findUtil';
+import { createNavigation } from '/src/utils/manipulationUtil';
 import {
   findTagLocationEvent,
   footerDetectEvent,
 } from '/src/event/visibleEvent.js';
+import { stateReset } from './constants/state';
 
 const init = () => {
+
   // 네비게이션이 이미 존재하면 더이상 생성되지 않습니다.
   if (isNavigation()) return;
-
   footerDetectEvent();
+
+  stateReset();
+
   findTagLocationEvent();
 
   const sectionElement = findSectionElement();
   if (sectionElement === null) return;
 
   createNavigation(sectionElement);
-}
+};
 
 // MutationObserver를 사용해 페이지를 감지합니다.
 (() => {
@@ -39,6 +43,6 @@ const init = () => {
     }, 1000);
   });
 
-  const config = {childList: true, subtree: true};
+  const config = { childList: true, subtree: true };
   observer.observe(document.body, config);
 })();
