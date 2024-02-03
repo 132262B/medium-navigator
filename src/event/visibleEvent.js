@@ -5,6 +5,7 @@ import { findFooterElement } from '/src/utils/findUtil';
 export const footerDetectEvent = () => {
   if (state.hiddenFlag) {
     state.hiddenFlag = false;
+
     const footer = findFooterElement();
     if (footer !== null) {
 
@@ -13,9 +14,13 @@ export const footerDetectEvent = () => {
 
         const navigationElement = document.querySelector(`.${classField.navigationClassName}`);
         if (navigationElement !== null) {
-          if (footerRect.top < 0) {
+
+          const shouldHide = footerRect.top < 0;
+          const isHidden = navigationElement.classList.contains(classField.hiddenClassName);
+
+          if (shouldHide && !isHidden) {
             navigationElement.classList.add(classField.hiddenClassName);
-          } else {
+          } else if (!shouldHide && isHidden) {
             navigationElement.classList.remove(classField.hiddenClassName);
           }
         }
