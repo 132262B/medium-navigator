@@ -11,11 +11,10 @@ export const footerDetectEvent = () => {
 
       window.addEventListener('scroll', () => {
         const footerRect = footer.getBoundingClientRect();
-
         const navigationElement = document.querySelector(`.${classField.navigationClassName}`);
         if (navigationElement !== null) {
 
-          const shouldHide = footerRect.top < 0;
+          const shouldHide = footerRect.top <= 0;
           const isHidden = navigationElement.classList.contains(classField.hiddenClassName);
 
           if (shouldHide && !isHidden) {
