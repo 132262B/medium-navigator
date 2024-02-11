@@ -1,11 +1,8 @@
 'use strict';
 
-import { isNavigation, findSectionElement } from '/src/utils/findUtil';
-import { createNavigation } from '/src/utils/manipulationUtil';
-import {
-  findTagLocationEvent,
-  footerDetectEvent,
-} from '/src/event/visibleEvent.js';
+import { isNavigation, findSectionElement } from './utils/findUtil';
+import { createNavigation } from './utils/manipulationUtil';
+import { findTagLocationEvent, footerDetectEvent, } from './event/visibleEvent';
 import { stateReset } from './constants/state';
 
 const init = () => {
@@ -18,7 +15,7 @@ const init = () => {
 
   findTagLocationEvent();
 
-  const sectionElement = findSectionElement();
+  const sectionElement : HTMLElement | null = findSectionElement();
   if (sectionElement === null) return;
 
   createNavigation(sectionElement);
@@ -26,8 +23,9 @@ const init = () => {
 
 // MutationObserver를 사용해 페이지를 감지합니다.
 (() => {
-  let timeout = null;
+  let timeout : NodeJS.Timeout | null = null;
   const observer = new MutationObserver(mutations => {
+    console.log(timeout)
     // 이미 타이머가 설정된 경우, 새로운 변경사항 무시
     if (timeout) return;
 

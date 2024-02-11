@@ -1,6 +1,6 @@
-import { classField, valueAdjuster } from '/src/constants/constants';
-import { state } from '/src/constants/state';
-import { findFooterElement } from '/src/utils/findUtil';
+import { classField, valueAdjuster } from '../constants/constants';
+import { NavigatorContent, state } from '../constants/state';
+import { findFooterElement } from '../utils/findUtil';
 
 export const footerDetectEvent = () => {
   if (state.hiddenFlag) {
@@ -29,22 +29,23 @@ export const footerDetectEvent = () => {
 };
 
 export const findTagLocationEvent = () => {
-  let currentActiveTag = null; // 현재 활성화된 태그를 추적하기 위한 변수
+  let currentActiveTag: Element | null = null; // 현재 활성화된 태그를 추적하기 위한 변수
 
   window.addEventListener('scroll', () => {
     let currentScrollPosition = window.scrollY;
 
-    state.contents.forEach(section => {
-      const sectionElement = document.querySelector(`#n-${section.tagId}`);
+    state.contents.forEach((section: NavigatorContent) => {
+      const sectionElement: Element | null = document.querySelector(`#n-${section.tagId}`);
 
       if (currentScrollPosition >= (section.scrollPosition - valueAdjuster.adjustmentTagLocation)) {
-        sectionElement.classList.add(classField.activeTagClassName);
+        if (sectionElement !== null) sectionElement.classList.add(classField.activeTagClassName);
+
         if (currentActiveTag && (currentActiveTag !== sectionElement)) {
           currentActiveTag.classList.remove(classField.activeTagClassName);
         }
         currentActiveTag = sectionElement; // 현재 활성화된 태그 업데이트
       } else {
-        sectionElement.classList.remove(classField.activeTagClassName);
+        if (sectionElement !== null) sectionElement.classList.remove(classField.activeTagClassName);
       }
     });
   });
