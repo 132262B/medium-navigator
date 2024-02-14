@@ -3,15 +3,15 @@
 const { merge } = require('webpack-merge');
 
 const common = require('./webpack.common.js');
-const PATHS = require('./paths');
+const paths = require('./paths');
 
 // Merge webpack configuration files
 const config = (env, argv) =>
   merge(common, {
     entry: {
-      popup: PATHS.src + '/popup.ts',
-      contentScript: PATHS.src + '/contentScript.ts',
-      background: PATHS.src + '/background.ts',
+      popup: paths.src + '/popup.ts',
+      contentScript: paths.src + '/contentScript.ts',
+      background: paths.src + '/background.ts',
     },
     module: {
       rules: [
@@ -23,7 +23,11 @@ const config = (env, argv) =>
       ],
     },
     resolve: {
-      extensions: ['.tsx', '.ts', '.js'],
+      alias: {
+        '@': paths.src,
+      },
+      modules: [paths.src, 'node_modules'],
+      extensions: ['.tsx', '.ts', '.js', '.json'],
     },
     devtool: argv.mode === 'production' ? false : 'source-map',
   });

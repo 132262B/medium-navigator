@@ -1,5 +1,5 @@
-import { classField } from '../constants/constants';
-import { NavigatorContent, state } from '../constants/state';
+import { classField } from '@/constants/constants';
+import { NavigatorContent, state } from '@/constants/state';
 
 const createNavigationElement = (navigationContentElement: string) => {
   const floatingDiv = document.createElement('div');

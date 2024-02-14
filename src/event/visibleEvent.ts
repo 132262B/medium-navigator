@@ -1,6 +1,6 @@
-import { classField, valueAdjuster } from '../constants/constants';
-import { NavigatorContent, state } from '../constants/state';
-import { findFooterElement } from '../utils/findUtil';
+import { classField, valueAdjuster } from '@/constants/constants';
+import { NavigatorContent, state } from '@/constants/state';
+import { findFooterElement } from '@/utils/findUtil';
 
 export const footerDetectEvent = () => {
   if (state.hiddenFlag) {

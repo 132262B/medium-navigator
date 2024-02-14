@@ -1,9 +1,9 @@
 'use strict';
 
-import { isNavigation, findSectionElement } from './utils/findUtil';
-import { createNavigation } from './utils/manipulationUtil';
-import { findTagLocationEvent, footerDetectEvent, } from './event/visibleEvent';
-import { stateReset } from './constants/state';
+import { isNavigation, findSectionElement } from '@/utils/findUtil';
+import { createNavigation } from '@/utils/manipulationUtil';
+import { findTagLocationEvent, footerDetectEvent, } from '@/event/visibleEvent';
+import { stateReset } from '@/constants/state';
 
 const init = () => {
 

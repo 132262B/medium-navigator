@@ -1,4 +1,4 @@
-import { classField } from '../constants/constants';
+import { classField } from '@/constants/constants';
 
 export const isNavigation = () => {
   return document.getElementsByClassName(classField.navigationClassName).length !== 0;
