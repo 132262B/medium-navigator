@@ -1,6 +1,6 @@
 {
   "name": "medium-navigator",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Enhance Medium with our extension: Quick, easy navigation for a smoother reading experience!",
   "private": true,
   "scripts": {
