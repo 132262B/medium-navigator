@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Medium Navigator",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Enhance Medium with our extension: Quick, easy navigation for a smoother reading experience!",
   "icons": {
     "16": "icons/icon-16.png",
@@ -17,6 +17,9 @@
       "matches": [
         "https://medium.com/*/*",
         "https://*.medium.com/*"
+      ],
+      "exclude_matches": [
+        "https://medium.com/new-story"
       ],
       "js": [
         "contentScript.js"
