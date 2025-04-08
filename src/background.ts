@@ -1,12 +1,14 @@
 'use strict';
 
+import { logger } from './utils/logger';
+
 // 초기 상태 설정
 chrome.runtime.onInstalled.addListener(() => {
-  console.log('Extension installed or updated');
+  logger.log('Extension installed or updated');
   
   // 확장 프로그램 설치/업데이트 시 초기 상태 설정
   chrome.storage.local.set({ navigatorEnabled: true }, () => {
-    console.log('Initial state set to true on installation');
+    logger.log('Initial state set to true on installation');
   });
 });
 
@@ -16,18 +18,18 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     // 페이지 로드 완료 시 상태 확인
     chrome.storage.local.get(['navigatorEnabled'], function(result) {
       const isEnabled = result.navigatorEnabled !== false;
-      console.log('Tab updated, current state:', isEnabled);
+      logger.log('Tab updated, current state:', isEnabled);
       
       // 약간의 지연 후 메시지 전송 (콘텐츠 스크립트가 로드될 시간 확보)
       setTimeout(() => {
         try {
-          console.log('Sending state to tab:', tabId);
+          logger.log('Sending state to tab:', tabId);
           chrome.tabs.sendMessage(tabId, {
             action: 'toggleNavigator',
             enabled: isEnabled
           });
         } catch (error) {
-          console.error('Error sending message to tab:', error);
+          logger.error('Error sending message to tab:', error);
         }
       }, 500);
     });
@@ -40,7 +42,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'getNavigatorState') {
     chrome.storage.local.get(['navigatorEnabled'], function(result) {
       const isEnabled = result.navigatorEnabled !== false;
-      console.log('State requested, current state:', isEnabled);
+      logger.log('State requested, current state:', isEnabled);
       sendResponse({ enabled: isEnabled });
     });
     return true; // 비동기 응답을 위해 true 반환
@@ -48,18 +50,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   
   // 상태 변경 알림 처리
   if (message.action === 'navigatorStateChanged') {
-    console.log('State change notification received:', message.enabled);
+    logger.log('State change notification received:', message.enabled);
     // 현재 활성 탭에만 상태 변경 적용 (다른 탭은 필요할 때 자체적으로 상태를 로드)
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
       if (tabs[0] && tabs[0].id) {
         try {
-          console.log('Applying state change to active tab:', tabs[0].id);
+          logger.log('Applying state change to active tab:', tabs[0].id);
           chrome.tabs.sendMessage(tabs[0].id, {
             action: 'toggleNavigator',
             enabled: message.enabled
           });
         } catch (error) {
-          console.error('Error applying state change:', error);
+          logger.error('Error applying state change:', error);
         }
       }
     });
