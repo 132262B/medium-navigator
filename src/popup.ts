@@ -11,10 +11,8 @@ interface ToggleMessage {
 
 document.addEventListener('DOMContentLoaded', function() {
   const toggle = document.getElementById('navigatorToggle') as HTMLInputElement;
-  const statusText = document.getElementById('statusText') as HTMLSpanElement;
 
   function updateStatusText(isEnabled: boolean): void {
-    statusText.textContent = isEnabled ? 'Navigation is enabled' : 'Navigation is disabled';
     logger.log('Status text updated:', isEnabled ? 'Navigation is enabled' : 'Navigation is disabled');
   }
 

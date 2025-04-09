@@ -34,7 +34,7 @@
         "contentScript.js"
       ],
       "css": [
-        "style/navigatorStyle.css"
+        "styles/navigatorStyle.css"
       ],
       "run_at": "document_end"
     }
