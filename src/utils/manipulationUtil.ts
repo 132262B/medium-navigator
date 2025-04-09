@@ -1,5 +1,5 @@
 import { classField } from '@/constants/constants';
-import { NavigatorContent, state } from '@/constants/state';
+import { NavigatorContent, state, createNavigatorContent } from '@/constants/state';
 
 const createNavigationElement = (navigationContentElement: string) => {
   const floatingDiv = document.createElement('div');
@@ -15,7 +15,7 @@ const pushNavigationContent = (tags: NodeListOf<Element>) => {
   tags.forEach(tag => {
     if (tag.id) {
       state.contents.push(
-        new NavigatorContent(
+        createNavigatorContent(
           tag.id,
           tag.tagName.toLowerCase(),
           tag.textContent,
