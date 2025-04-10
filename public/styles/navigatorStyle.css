@@ -47,4 +47,42 @@
 .active-tag {
   color: #000000;
   font-weight: bold;
+}
+
+/* 번역 컨트롤 스타일 */
+.translation-controls {
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.translation-controls select {
+  width: 100%;
+  padding: 5px;
+  margin-bottom: 8px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.translation-controls button {
+  background-color: #3366ff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 12px;
+  margin-right: 5px;
+}
+
+.translation-controls button:hover {
+  background-color: #2851d8;
+}
+
+.translation-controls button:disabled {
+  background-color: #a5b4e8;
+  cursor: not-allowed;
 } 
