@@ -44,20 +44,47 @@ const createNavigationList = (): string => {
  * 번역 버튼을 생성합니다.
  */
 const createTranslationControls = (): string => {
+  const languages = [
+    { code: 'ko', name: '한국어' },
+    { code: 'en', name: 'English' },
+    { code: 'ja', name: '日本語' },
+    { code: 'zh-CN', name: '中文' },
+    { code: 'fr', name: 'Français' },
+    { code: 'de', name: 'Deutsch' },
+    { code: 'es', name: 'Español' }
+  ];
+  
+  let optionsHtml = '';
+  
+  languages.forEach(lang => {
+    optionsHtml += `<option value="${lang.code}">${lang.name}</option>`;
+  });
+
   return `
     <div class="translation-controls">
       <select id="target-language">
-        <option value="ko">한국어</option>
-        <option value="en">English</option>
-        <option value="ja">日本語</option>
-        <option value="zh-CN">中文</option>
-        <option value="fr">Français</option>
-        <option value="de">Deutsch</option>
-        <option value="es">Español</option>
+        ${optionsHtml}
       </select>
       <div class="btn-group">
-        <button id="translate-content">번역하기</button>
-        <button id="reset-translation" style="display:none;">원문 보기</button>
+        <button id="translate-content">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;">
+            <path d="m5 8 6 6"></path>
+            <path d="m4 14 6-6 2-3"></path>
+            <path d="M2 5h12"></path>
+            <path d="M7 2h1"></path>
+            <path d="m22 22-5-10-5 10"></path>
+            <path d="M14 18h6"></path>
+          </svg>
+          번역하기
+        </button>
+        <button id="reset-translation" style="display:none;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;">
+            <path d="M2 12a10 10 0 1 0 20 0 10 10 0 1 0-20 0"></path>
+            <path d="M12 8v8"></path>
+            <path d="m9 11 3-3 3 3"></path>
+          </svg>
+          원문 보기
+        </button>
       </div>
     </div>
   `;
