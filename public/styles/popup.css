@@ -1,6 +1,6 @@
 body {
   width: 250px;
-  padding: 20px;
+  padding: 8px;
   font-family: sans-serif;
   margin: 0;
   background-color: #f9fbfd;
@@ -10,7 +10,7 @@ body {
 .container {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
   background-color: white;
   border-radius: 16px;
   padding: 20px;
@@ -100,4 +100,4 @@ input:checked + .slider {
 
 input:checked + .slider:before {
   transform: translateX(22px);
-} 
+}

@@ -55,8 +55,10 @@ const createTranslationControls = (): string => {
         <option value="de">Deutsch</option>
         <option value="es">Español</option>
       </select>
-      <button id="translate-content">번역하기</button>
-      <button id="reset-translation" style="display:none;">원문 보기</button>
+      <div class="btn-group">
+        <button id="translate-content">번역하기</button>
+        <button id="reset-translation" style="display:none;">원문 보기</button>
+      </div>
     </div>
   `;
 };

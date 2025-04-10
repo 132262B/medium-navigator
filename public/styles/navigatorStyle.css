@@ -56,15 +56,22 @@
   background-color: #f8f9fa;
   border-radius: 8px;
   font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .translation-controls select {
-  width: 100%;
+  width: auto;
+  flex: 1;
   padding: 5px;
-  margin-bottom: 8px;
+  margin-bottom: 0;
   border: 1px solid #ced4da;
   border-radius: 4px;
   font-size: 12px;
+  min-width: 100px;
 }
 
 .translation-controls button {
@@ -75,7 +82,8 @@
   padding: 4px 8px;
   cursor: pointer;
   font-size: 12px;
-  margin-right: 5px;
+  margin-right: 0;
+  white-space: nowrap;
 }
 
 .translation-controls button:hover {
@@ -85,4 +93,9 @@
 .translation-controls button:disabled {
   background-color: #a5b4e8;
   cursor: not-allowed;
+}
+
+.btn-group {
+  display: flex;
+  gap: 4px;
 } 
