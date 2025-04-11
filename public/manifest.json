@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Medium Navigator",
-  "version": "1.3.0",
+  "version": "2.0.0",
   "description": "Enhance Medium with our extension: Quick, easy navigation for a smoother reading experience!",
   "icons": {
     "16": "icons/icon-16.png",
