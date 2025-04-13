@@ -243,11 +243,11 @@ chrome.storage.local.get(['navigatorEnabled'], (result: StorageResult) => {
 // 페이지 변경 감지 및 자동 초기화
 (() => {
   let timeout: NodeJS.Timeout | null = null;
-  let lastUrl = window.location.href;
+  let lastUrl = window.location.origin + window.location.pathname;
 
   // URL 변경 감지 함수
   const checkUrlChange = () => {
-    const currentUrl = window.location.href;
+    const currentUrl = window.location.origin + window.location.pathname;
     if (currentUrl !== lastUrl) {
       logger.log('URL 변경 감지됨:', lastUrl, '->', currentUrl);
       lastUrl = currentUrl;

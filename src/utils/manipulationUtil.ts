@@ -34,7 +34,7 @@ const createNavigationList = (): string => {
 
   state.contents.forEach((content: NavigatorContent) => {
     contents += `
-        <a id="n-${content.tagId}" href="#${content.tagId}" class="navigation-link navigation-link-${content.tagType.toLowerCase()}">${content.textContent}</a>
+        <a id="n-${content.tagId}" href="?#${content.tagId}" class="navigation-link navigation-link-${content.tagType.toLowerCase()}">${content.textContent}</a>
         <br>
         `;
   });
@@ -72,6 +72,17 @@ const createTranslationControls = (): string => {
 };
 
 /**
+ * href 속성에서 ID를 추출합니다.
+ * @param href href 속성 값 (예: "?#tagId" 또는 "#tagId")
+ * @returns 추출된 ID
+ */
+const extractIdFromHref = (href: string | null): string => {
+  if (!href) return '';
+  const hashIndex = href.indexOf('#');
+  return hashIndex !== -1 ? href.substring(hashIndex + 1) : '';
+};
+
+/**
  * 번역 동작을 위한 이벤트 리스너를 설정합니다.
  */
 const setupTranslationEvents = (sectionElement: HTMLElement) => {
@@ -93,17 +104,27 @@ const setupTranslationEvents = (sectionElement: HTMLElement) => {
       // 번역 수행
       await translateElements(sectionElement, TC.selectors.translatable, targetLang);
       
-      // 네비게이션 아이템도 번역
+      // 번역된 태그에서 정보 다시 가져와서 네비게이션 항목 업데이트
+      const tags: NodeListOf<Element> = sectionElement.querySelectorAll('h1, h2');
+      state.contents.forEach((content, index) => {
+        const tag = Array.from(tags).find(t => t.id === content.tagId);
+        if (tag && tag.hasAttribute(TC.attributes.translated)) {
+          // 번역된 텍스트로 상태 업데이트
+          content.textContent = tag.textContent || content.textContent;
+        }
+      });
+      
+      // 네비게이션 항목 업데이트
       const navLinks = document.querySelectorAll<HTMLElement>(TC.selectors.navigation);
-      for (const link of Array.from(navLinks)) {
-        const elementId = link.getAttribute('href')?.substring(1) || '';
+      navLinks.forEach(link => {
+        const elementId = extractIdFromHref(link.getAttribute('href'));
         if (elementId) {
-          const originalElement = document.getElementById(elementId);
-          if (originalElement && originalElement.hasAttribute(TC.attributes.translated)) {
-            link.innerText = originalElement.innerText;
+          const contentItem = state.contents.find(content => content.tagId === elementId);
+          if (contentItem) {
+            link.innerText = contentItem.textContent || '';
           }
         }
-      }
+      });
       
       // 상태 변경
       translateButton.style.display = 'none';
@@ -129,17 +150,27 @@ const setupTranslationEvents = (sectionElement: HTMLElement) => {
       }
     });
     
-    // 네비게이션 아이템 복원
+    // 원본 태그에서 정보 다시 가져와서 네비게이션 항목 업데이트
+    const tags: NodeListOf<Element> = sectionElement.querySelectorAll('h1, h2');
+    state.contents.forEach((content, index) => {
+      const tag = Array.from(tags).find(t => t.id === content.tagId);
+      if (tag) {
+        // 원본 텍스트로 상태 업데이트
+        content.textContent = tag.textContent || content.textContent;
+      }
+    });
+    
+    // 네비게이션 항목 복원
     const navLinks = document.querySelectorAll<HTMLElement>(TC.selectors.navigation);
-    for (const link of Array.from(navLinks)) {
-      const elementId = link.getAttribute('href')?.substring(1) || '';
+    navLinks.forEach(link => {
+      const elementId = extractIdFromHref(link.getAttribute('href'));
       if (elementId) {
-        const targetTag = state.contents.find(content => content.tagId === elementId);
-        if (targetTag) {
-          link.innerText = targetTag.textContent || '';
+        const contentItem = state.contents.find(content => content.tagId === elementId);
+        if (contentItem) {
+          link.innerText = contentItem.textContent || '';
         }
       }
-    }
+    });
     
     // 상태 변경
     resetButton.style.display = 'none';

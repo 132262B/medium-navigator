@@ -20,8 +20,11 @@ export const translateText = async (
       return text;
     }
 
+
     // URL 인코딩 및 요청 URL 생성
     const encodedText = encodeURIComponent(text);
+
+    logger.log('translateText', encodedText);
     const url = `${TC.api.baseUrl}?client=gtx&sl=${sourceLang}&tl=${targetLang}&dt=t&q=${encodedText}`;
 
     // 번역 API 호출
