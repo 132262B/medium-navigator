@@ -2,6 +2,7 @@ import { classField, icons, LanguageCode, languages } from '@/constants/constant
 import { NavigatorContent, state, createNavigatorContent } from '@/constants/state';
 import { translateElements } from './translationUtil';
 import { logger } from './logger';
+import { translationConstants as TC } from '@/constants/constants';
 
 const createNavigationElement = (navigationContentElement: string) => {
   const floatingDiv = document.createElement('div');
@@ -45,13 +46,9 @@ const createNavigationList = (): string => {
  * 번역 버튼을 생성합니다.
  */
 const createTranslationControls = (): string => {
-  if(state.contents.length === 0) {
-    return '';
-  }
-
   let optionsHtml = '';
-
-  languages.forEach(lang => {
+  
+  TC.languages.forEach(lang => {
     optionsHtml += `<option value="${lang.code}">${lang.name}</option>`;
   });
 
@@ -63,11 +60,11 @@ const createTranslationControls = (): string => {
       <div class="btn-group">
         <button id="translate-content">
           ${icons.translate}
-          translate
+          ${TC.buttonText.translate}
         </button>
         <button id="reset-translation" style="display:none;">
           ${icons.resetTranslation}
-          original text
+          ${TC.buttonText.original}
         </button>
       </div>
     </div>
@@ -81,59 +78,59 @@ const setupTranslationEvents = (sectionElement: HTMLElement) => {
   const translateButton = document.getElementById('translate-content') as HTMLButtonElement;
   const resetButton = document.getElementById('reset-translation') as HTMLButtonElement;
   const languageSelect = document.getElementById('target-language') as HTMLSelectElement;
-
+  
   if (!translateButton || !resetButton || !languageSelect) return;
-
+  
   // 번역 버튼 클릭 이벤트
   translateButton.addEventListener('click', async () => {
     const targetLang = languageSelect.value as LanguageCode;
-
+    
     // 로딩 상태 표시
-    translateButton.textContent = 'translating ...';
+    translateButton.textContent = TC.buttonText.translating;
     translateButton.disabled = true;
-
+    
     try {
-      // 제목(h1, h2), 본문(p), 리스트(li) 번역
-      await translateElements(sectionElement, 'h1, h2, p, li', targetLang);
-
+      // 번역 수행
+      await translateElements(sectionElement, TC.selectors.translatable, targetLang);
+      
       // 네비게이션 아이템도 번역
-      const navLinks = document.querySelectorAll<HTMLElement>('.navigation-link');
+      const navLinks = document.querySelectorAll<HTMLElement>(TC.selectors.navigation);
       for (const link of Array.from(navLinks)) {
         const elementId = link.getAttribute('href')?.substring(1) || '';
         if (elementId) {
           const originalElement = document.getElementById(elementId);
-          if (originalElement && originalElement.hasAttribute('data-translated')) {
+          if (originalElement && originalElement.hasAttribute(TC.attributes.translated)) {
             link.innerText = originalElement.innerText;
           }
         }
       }
-
+      
       // 상태 변경
       translateButton.style.display = 'none';
       resetButton.style.display = 'inline-block';
     } catch (error) {
       logger.error('Translation failed:', error);
-      translateButton.textContent = 'failed';
+      translateButton.textContent = TC.buttonText.failed;
     } finally {
       translateButton.disabled = false;
     }
   });
-
+  
   // 원문 보기 버튼 클릭 이벤트
   resetButton.addEventListener('click', () => {
     // 번역된 요소 복원
-    const translatedElements = sectionElement.querySelectorAll('[data-translated="true"]');
+    const translatedElements = sectionElement.querySelectorAll(`[${TC.attributes.translated}="${TC.attributes.valueTrue}"]`);
     translatedElements.forEach(element => {
-      const originalHtml = element.getAttribute('data-original-html');
+      const originalHtml = element.getAttribute(TC.attributes.originalHtml);
       if (originalHtml) {
         (element as HTMLElement).innerHTML = originalHtml;
-        element.removeAttribute('data-translated');
-        element.removeAttribute('data-original-html');
+        element.removeAttribute(TC.attributes.translated);
+        element.removeAttribute(TC.attributes.originalHtml);
       }
     });
-
+    
     // 네비게이션 아이템 복원
-    const navLinks = document.querySelectorAll<HTMLElement>('.navigation-link');
+    const navLinks = document.querySelectorAll<HTMLElement>(TC.selectors.navigation);
     for (const link of Array.from(navLinks)) {
       const elementId = link.getAttribute('href')?.substring(1) || '';
       if (elementId) {
@@ -143,11 +140,11 @@ const setupTranslationEvents = (sectionElement: HTMLElement) => {
         }
       }
     }
-
+    
     // 상태 변경
     resetButton.style.display = 'none';
     translateButton.style.display = 'inline-block';
-    translateButton.textContent = 'translate';
+    translateButton.innerHTML = icons.translate + TC.buttonText.translate;
   });
 };
 

@@ -1,5 +1,6 @@
-import { LanguageCode } from "@/constants/constants";
+import { LanguageCode, space, translationConstants as TC } from "@/constants/constants";
 import { logger } from "./logger";
+import { protectEmojis } from "./emojisUtils";
 
 /**
  * 텍스트를 번역합니다.
@@ -14,22 +15,23 @@ export const translateText = async (
   sourceLang: LanguageCode | 'auto' = 'auto'
 ): Promise<string> => {
   try {
+    // 빈 텍스트는 번역하지 않음
     if (!text || text.trim() === '') {
       return text;
     }
 
+    // URL 인코딩 및 요청 URL 생성
     const encodedText = encodeURIComponent(text);
+    const url = `${TC.api.baseUrl}?client=gtx&sl=${sourceLang}&tl=${targetLang}&dt=t&q=${encodedText}`;
 
-    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sourceLang}&tl=${targetLang}&dt=t&q=${encodedText}`;
-
+    // 번역 API 호출
     const response = await fetch(url);
-
     if (!response.ok) {
       throw new Error(`Translation failed with status: ${response.status}`);
     }
 
+    // 응답 데이터 처리
     const data = await response.json();
-
     let translatedText = '';
 
     if (data && Array.isArray(data) && data[0] && Array.isArray(data[0])) {
@@ -44,6 +46,74 @@ export const translateText = async (
     logger.error('Translation error:', error);
     return text; // 오류 발생 시 원본 텍스트 반환
   }
+};
+
+/**
+ * 노드가 번역에서 제외되어야 하는지 확인합니다.
+ * @param node 확인할 노드
+ * @returns 제외 여부 (true: 제외, false: 번역 대상)
+ */
+const shouldSkipTranslation = (node: Node): boolean => {
+  // 요소 노드가 아니면 건너뛰지 않음
+  if (node.nodeType !== Node.ELEMENT_NODE) {
+    return false;
+  }
+
+  const element = node as Element;
+  
+  // notranslate 클래스가 있으면 건너뜀
+  if (element.classList && element.classList.contains(TC.classNames.noTranslate)) {
+    return true;
+  }
+  
+  // 제외 태그 목록에 있으면 건너뜀
+  const tagName = element.nodeName.toLowerCase();
+  return TC.excludedTags.includes(tagName);
+};
+
+/**
+ * 텍스트 노드를 처리하여 번역합니다.
+ * @param node 처리할 텍스트 노드
+ * @param targetLang 대상 언어 코드
+ * @param sourceLang 원본 언어 코드
+ */
+const processTextNode = async (
+  node: Node,
+  targetLang: LanguageCode,
+  sourceLang: LanguageCode | 'auto'
+): Promise<void> => {
+  if (!node.textContent || !node.textContent.trim()) {
+    return;
+  }
+  
+  // 이모지 보호를 위한 임시 요소 생성
+  const tempSpan = document.createElement('span');
+  tempSpan.innerHTML = protectEmojis(node.textContent);
+  
+  // 번역 대상 노드 선별
+  const textNodes = Array.from(tempSpan.childNodes).filter(
+    childNode => 
+      childNode.nodeType === Node.TEXT_NODE || 
+      (childNode.nodeType === Node.ELEMENT_NODE && 
+       !(childNode as Element).classList.contains(TC.classNames.noTranslate))
+  );
+  
+  // 텍스트 노드만 번역
+  for (const textNode of textNodes) {
+    if (textNode.nodeType === Node.TEXT_NODE && textNode.textContent && textNode.textContent.trim()) {
+      const translatedText = await translateText(textNode.textContent, targetLang, sourceLang);
+      if (translatedText && translatedText !== textNode.textContent) {
+        textNode.textContent = `${translatedText}${space}`;
+      }
+    }
+  }
+  
+  // 원래 노드 대체
+  const fragment = document.createDocumentFragment();
+  while (tempSpan.firstChild) {
+    fragment.appendChild(tempSpan.firstChild);
+  }
+  node.parentNode?.replaceChild(fragment, node);
 };
 
 /**
@@ -62,83 +132,42 @@ export const translateElement = async (
     // 원본 HTML 콘텐츠 저장
     const originalHtml = element.innerHTML;
     
-    // 태그 및 속성을 보호하는 방식으로 처리
+    // HTML 구조 복제
     const tempElement = document.createElement('div');
     tempElement.innerHTML = originalHtml;
     
-    // 이모지만 태그로 감싸서 보호
-    const processTextForEmoji = (text: string): string => {
-      return text.replace(
-        /(\p{Emoji}|\p{Emoji_Presentation}|\p{Emoji_Modifier}|\p{Emoji_Modifier_Base}|\p{Emoji_Component}|[\u{1F000}-\u{1FFFF}])/gu, 
-        (match) => `<span class="notranslate">${match}${' '}</span>`
-      );
-    };
-
-    // HTML 태그를 보존하기 위한 처리
+    // HTML 구조를 순회하면서 번역 처리
     const processNode = async (node: Node): Promise<void> => {
-      // 요소 노드인 경우 (태그)
-      if (node.nodeType === Node.ELEMENT_NODE) {
-        // notranslate 클래스가 있는 요소는 번역하지 않음
-        if (
-          (node as Element).classList && 
-          (node as Element).classList.contains('notranslate')
-        ) {
-          return;
-        }
-        
-        // 자식 노드 처리 - 순차적으로 처리
-        const children = Array.from(node.childNodes);
-        for (let i = 0; i < children.length; i++) {
-          await processNode(children[i]);
-        }
+      // 번역 제외 대상인지 확인
+      if (shouldSkipTranslation(node)) {
+        return;
       }
-
-      // 텍스트 노드인 경우
-      if (node.nodeType === Node.TEXT_NODE && node.textContent && node.textContent.trim()) {
-        // 이모지 태그로 감싸기
-        const tempSpan = document.createElement('span');
-        tempSpan.innerHTML = processTextForEmoji(node.textContent);
-        
-        // 모든 텍스트 노드 및 이모지가 아닌 노드 찾기
-        const textNodes = Array.from(tempSpan.childNodes).filter(
-          childNode => 
-            childNode.nodeType === Node.TEXT_NODE || 
-            (childNode.nodeType === Node.ELEMENT_NODE && 
-             !(childNode as Element).classList.contains('notranslate'))
-        );
-        
-        // 텍스트 노드만 번역
-        for (const textNode of textNodes) {
-          if (textNode.nodeType === Node.TEXT_NODE && textNode.textContent && textNode.textContent.trim()) {
-            const translatedText = await translateText(textNode.textContent, targetLang, sourceLang);
-            if (translatedText && translatedText !== textNode.textContent) {
-              textNode.textContent = translatedText;
-            }
-          }
+      
+      // 노드 타입에 따른 처리
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        // 요소 노드: 자식 노드들을 재귀적으로 처리
+        const children = Array.from(node.childNodes);
+        for (const child of children) {
+          await processNode(child);
         }
-        
-        // 원래 노드 대체
-        const fragment = document.createDocumentFragment();
-        while (tempSpan.firstChild) {
-          fragment.appendChild(tempSpan.firstChild);
-        }
-        node.parentNode?.replaceChild(fragment, node);
+      } else if (node.nodeType === Node.TEXT_NODE) {
+        // 텍스트 노드: 번역 처리
+        await processTextNode(node, targetLang, sourceLang);
       }
     };
 
-    // 루트 레벨 노드들 처리
+    // 최상위 노드부터 처리 시작
     const rootNodes = Array.from(tempElement.childNodes);
-    for (let i = 0; i < rootNodes.length; i++) {
-      await processNode(rootNodes[i]);
+    for (const node of rootNodes) {
+      await processNode(node);
     }
 
     // 번역된 HTML로 업데이트
     const translatedHtml = tempElement.innerHTML;
-
     if (translatedHtml !== originalHtml) {
       element.innerHTML = translatedHtml;
-      element.setAttribute('data-translated', 'true');
-      element.setAttribute('data-original-html', originalHtml);
+      element.setAttribute(TC.attributes.translated, TC.attributes.valueTrue);
+      element.setAttribute(TC.attributes.originalHtml, originalHtml);
     }
   } catch (error) {
     logger.error('Element translation error:', error);
@@ -155,30 +184,32 @@ export const translateElement = async (
  */
 export const translateElements = async (
   container: HTMLElement,
-  selector: string,
+  selector: string = TC.selectors.translatable,
   targetLang: LanguageCode,
   sourceLang: LanguageCode | 'auto' = 'auto'
 ): Promise<void> => {
+  // 번역할 요소들 선택
   const elements = container.querySelectorAll<HTMLElement>(selector);
-
-  // 번역 요청을 일괄적으로 처리하면 속도와 안정성이 향상됨
-  // 하지만 과도한 요청은 차단될 수 있으므로 배치 크기 제한
-  const batchSize = 5;
-  const delay = 500; // ms
-
+  
+  // 배치 처리 설정
+  const { batchSize, delayMs } = TC.api;
+  
+  // 배치 단위로 처리하여 API 부하 분산
   for (let i = 0; i < elements.length; i += batchSize) {
+    // 현재 배치 추출
     const batch = Array.from(elements).slice(i, i + batchSize);
-
-    // 배치 내 요소들 병렬 번역
+    
+    // 현재 배치 병렬 처리
     await Promise.all(
       batch.map(element => translateElement(element, targetLang, sourceLang))
     );
-
-    // API 요청 제한을 피하기 위한 지연
+    
+    // 다음 배치 전 지연 (API 제한 방지)
     if (i + batchSize < elements.length) {
-      await new Promise(resolve => setTimeout(resolve, delay));
+      await new Promise(resolve => setTimeout(resolve, delayMs));
     }
   }
-}; 
+};
 
 export { LanguageCode };
+

@@ -1,3 +1,5 @@
+export const space = ' ';
+
 export const classField = {
   navigationClassName: 'navigation-box',
   hiddenClassName: 'hidden',
@@ -34,3 +36,48 @@ export const languages = [
   { code: 'de', name: 'Deutsch' },
   { code: 'es', name: 'Español' }
 ];
+
+// 번역 관련 상수
+export const translationConstants = {
+  // CSS 클래스
+  classNames: {
+    noTranslate: 'notranslate',
+  },
+  
+  // 데이터 속성
+  attributes: {
+    translated: 'data-translated',
+    originalHtml: 'data-original-html',
+    valueTrue: 'true',
+  },
+  
+  // 버튼 텍스트
+  buttonText: {
+    translate: 'Translate',
+    translating: 'Translating...',
+    failed: 'Failed',
+    original: 'Original',
+  },
+  
+  // 번역 제외할 태그 (속성은 번역하지 않음)
+  excludedTags: ['a', 'script', 'style', 'code', 'pre'],
+  
+  // 이모지 정규식 패턴 (복합 이모지도 하나의 단위로 처리)
+  emojiRegex: /([\u{1F300}-\u{1F6FF}]|[\u{1F900}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F100}-\u{1F1FF}]|[\u{1F1E6}-\u{1F1FF}]|[\u{1F300}-\u{1F5FF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]|[\u{2600}-\u{26FF}]|\u{200D}|[\u{2700}-\u{27BF}]|\u{FE0F}|\u{20E3}|[\u{1F000}-\u{1F3FF}])/gu,
+
+  // 번역 API 설정
+  api: {
+    baseUrl: 'https://translate.googleapis.com/translate_a/single',
+    batchSize: 5,
+    delayMs: 500, // ms
+  },
+
+  // 번역 요소 선택자
+  selectors: {
+    translatable: 'h1, h2, p, li',
+    navigation: '.navigation-link',
+  },
+  
+  // 언어 목록 (중복 제거)
+  languages: languages
+};
