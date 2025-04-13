@@ -1,6 +1,7 @@
 import { classField, icons, LanguageCode, languages } from '@/constants/constants';
 import { NavigatorContent, state, createNavigatorContent } from '@/constants/state';
 import { translateElements } from './translationUtil';
+import { logger } from './logger';
 
 const createNavigationElement = (navigationContentElement: string) => {
   const floatingDiv = document.createElement('div');
@@ -44,7 +45,9 @@ const createNavigationList = (): string => {
  * 번역 버튼을 생성합니다.
  */
 const createTranslationControls = (): string => {
-
+  if(state.contents.length === 0) {
+    return '';
+  }
 
   let optionsHtml = '';
 
@@ -109,7 +112,7 @@ const setupTranslationEvents = (sectionElement: HTMLElement) => {
       translateButton.style.display = 'none';
       resetButton.style.display = 'inline-block';
     } catch (error) {
-      console.error('Translation failed:', error);
+      logger.error('Translation failed:', error);
       translateButton.textContent = 'failed';
     } finally {
       translateButton.disabled = false;
