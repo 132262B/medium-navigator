@@ -75,7 +75,7 @@ const createTranslationControls = (): string => {
             <path d="m22 22-5-10-5 10"></path>
             <path d="M14 18h6"></path>
           </svg>
-          번역하기
+          translate
         </button>
         <button id="reset-translation" style="display:none;">
           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;">
@@ -83,7 +83,7 @@ const createTranslationControls = (): string => {
             <path d="M12 8v8"></path>
             <path d="m9 11 3-3 3 3"></path>
           </svg>
-          원문 보기
+          original text
         </button>
       </div>
     </div>
