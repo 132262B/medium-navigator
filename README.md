@@ -1,11 +1,11 @@
 <div align="center">
-  <img src="public/icons/icon-128.png" width="128" alt="Medium Navigator" />
+  <img src="images/banner.png" width="400" alt="Medium Navigator" />
   <h1>Medium Navigator</h1>
   <p>Medium 블로그를 더 쉽고 편리하게 탐색할 수 있는 크롬 확장 프로그램</p>
 
   ![Version](https://img.shields.io/badge/version-2.0.0-blue)
   [![Chrome Web Store](https://img.shields.io/badge/Chrome%20Web%20Store-2.0.0-green?logo=google-chrome&logoColor=white)](https://chromewebstore.google.com/detail/medium-navigator/cakgellcgmlfnedjjgfcgikkgpfajfck)
-  ![License](https://img.shields.io/badge/License-Apache%202.0-blue)
+  ![License](https://img.shields.io/badge/License-MIT-blue)
 
 </div>
 
@@ -21,14 +21,15 @@
 - 글 작성/수정 페이지에서는 자동으로 비활성화
 - 포스트 내용 번역 기능 (코드 블록은 번역에서 제외)
 
+
 ## 설치 방법
 
-[<img src="https://storage.googleapis.com/web-dev-uploads/image/WlD8wC6g8khYWPJUsQceQkhXSlv1/tbyBjqi7Zu733AAKA5n4.png" alt="Chrome Web Store에서 다운로드하기" height="58">](https://chromewebstore.google.com/detail/medium-navigator/cakgellcgmlfnedjjgfcgikkgpfajfck)
+[<img src="images/chrome-web-store.png" alt="Chrome Web Store에서 다운로드하기" width="200">](https://chromewebstore.google.com/detail/medium-navigator/cakgellcgmlfnedjjgfcgikkgpfajfck)
 
 ## 스크린샷
 
 <div align="center">
-  <img src="[스크린샷 이미지 URL]" alt="Medium Navigator 스크린샷" width="600"/>
+  <img src="images/screenshot.png" alt="Medium Navigator Screenshot" width="1280"/>
 </div>
 
 
@@ -62,22 +63,13 @@
 ### 1.0.0
 - 최초 출시: Medium을 탐색하는 사용자 경험을 향상시키기 위한 글 네비게이션 확장 프로그램
 
-## 기여하기
-
-기여는 언제나 환영합니다! 버그 리포트, 기능 제안, 풀 리퀘스트 등 모든 형태의 기여가 가능합니다.
-
-1. 이 저장소를 포크하세요
-2. 새로운 브랜치를 생성하세요 (`git checkout -b feature/amazing-feature`)
-3. 변경사항을 커밋하세요 (`git commit -m 'Add some amazing feature'`)
-4. 브랜치에 푸시하세요 (`git push origin feature/amazing-feature`)
-5. 풀 리퀘스트를 열어주세요
 
 ## 라이선스
 
-이 프로젝트는 Apache 2.0 라이선스에 따라 배포됩니다. 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.
+이 프로젝트는 MIT 라이선스에 따라 배포됩니다. 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.
 
 ---
 
 <div align="center">
-  <sub>Made with ❤️ by [개발자 이름]</sub>
+  <sub>Made with ❤️ by Igor</sub>
 </div>
