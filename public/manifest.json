@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Medium Navigator",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "A navigation extension that makes exploring Medium blogs effortless.",
   "icons": {
     "16": "icons/icon-16.png",
