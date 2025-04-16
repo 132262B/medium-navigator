@@ -1,7 +1,7 @@
 {
   "name": "medium-navigator",
-  "version": "1.3.0",
-  "description": "Enhance Medium with our extension: Quick, easy navigation for a smoother reading experience!",
+  "version": "2.0.1",
+  "description": "A navigation extension that makes exploring Medium blogs effortless.",
   "private": true,
   "scripts": {
     "watch": "webpack --mode=development --watch --config config/webpack.config.js",
@@ -11,6 +11,7 @@
     "format": "prettier --write --ignore-unknown \"{config,public,src}/**/*.{html,css,js,ts,json}\""
   },
   "devDependencies": {
+    "@types/chrome": "^0.0.313",
     "adm-zip": "^0.5.10",
     "copy-webpack-plugin": "^10.2.4",
     "css-loader": "^6.9.1",
@@ -18,6 +19,7 @@
     "mini-css-extract-plugin": "^2.7.7",
     "prettier": "^2.8.8",
     "ts-loader": "^9.5.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5.3.3",
     "webpack": "^5.94.0",
     "webpack-cli": "^4.10.0",
