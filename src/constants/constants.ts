@@ -1,9 +1,9 @@
 export const space = ' ';
 
 export const classField = {
-  navigationClassName: 'navigation-box',
-  hiddenClassName: 'hidden',
-  activeTagClassName: 'active-tag'
+  navigationClassName: 'medium-navigator-navigation-box',
+  hiddenClassName: 'medium-navigator-hidden',
+  activeTagClassName: 'medium-navigator-active-tag'
 };
 
 export const valueAdjuster = {
@@ -75,7 +75,7 @@ export const translationConstants = {
   // 번역 요소 선택자
   selectors: {
     translatable: 'h1, h2, p, li',
-    navigation: '.navigation-link',
+    navigation: '.medium-navigator-navigation-link',
   },
   
   // 언어 목록 (중복 제거)

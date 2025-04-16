@@ -34,7 +34,7 @@ const createNavigationList = (): string => {
 
   state.contents.forEach((content: NavigatorContent) => {
     contents += `
-        <a id="n-${content.tagId}" href="?#${content.tagId}" class="navigation-link navigation-link-${content.tagType.toLowerCase()}">${content.textContent}</a>
+        <a id="n-${content.tagId}" href="?#${content.tagId}" class="medium-navigator-navigation-link medium-navigator-navigation-link-${content.tagType.toLowerCase()}">${content.textContent}</a>
         <br>
         `;
   });
@@ -53,11 +53,11 @@ const createTranslationControls = (): string => {
   });
 
   return `
-    <div class="translation-controls">
+    <div class="medium-navigator-translation-controls">
       <select id="target-language">
         ${optionsHtml}
       </select>
-      <div class="btn-group">
+      <div class="medium-navigator-btn-group">
         <button id="translate-content">
           ${icons.translate}
           ${TC.buttonText.translate}
