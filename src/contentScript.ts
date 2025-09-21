@@ -12,13 +12,15 @@ import { logger } from './utils/logger';
 import { classField } from './constants/constants';
 
 /**
- * 네비게이터 상태 관리 모듈
+ * 네비게이터 상태 관리 모듈 (강화된 중복 방지 로직)
  */
 const navigatorState = (() => {
   // 상태 변수들을 클로저 내에 보관
   let _isEnabled = true;
   let _isInitialized = false;
   let _isInitializing = false;
+  let _initializationPromise: Promise<void> | null = null;
+  let _initializationId = 0;
 
   return {
     /**
@@ -64,11 +66,40 @@ const navigatorState = (() => {
     },
 
     /**
+     * 현재 초기화 Promise getter
+     */
+    get initializationPromise() {
+      return _initializationPromise;
+    },
+
+    /**
+     * 초기화 Promise setter
+     */
+    set initializationPromise(promise) {
+      _initializationPromise = promise;
+    },
+
+    /**
+     * 고유한 초기화 ID 생성
+     */
+    generateInitId() {
+      return ++_initializationId;
+    },
+
+    /**
      * 상태 초기화 함수
      */
     reset() {
       _isInitialized = false;
       _isInitializing = false;
+      _initializationPromise = null;
+    },
+
+    /**
+     * 초기화 가능 여부 체크 (더 강력한 검증)
+     */
+    canInitialize() {
+      return !_isInitializing && !_isInitialized && _initializationPromise === null;
     }
   };
 })();
@@ -108,11 +139,16 @@ const navigatorUI = (() => {
  */
 const navigatorManager = (() => {
   /**
-   * 초기화를 건너뛰어야 하는지 확인합니다.
+   * 초기화를 건너뛰어야 하는지 확인합니다. (강화된 검증)
    */
   const shouldSkipInitialization = () => {
-    if (navigatorState.isInitializing || navigatorState.isInitialized) {
+    if (!navigatorState.canInitialize()) {
       logger.log('이미 초기화 중이거나 초기화된 상태입니다.');
+      return true;
+    }
+
+    if (!navigatorState.isEnabled) {
+      logger.log('네비게이터가 비활성화됨');
       return true;
     }
 
@@ -189,29 +225,47 @@ const navigatorManager = (() => {
   };
 
   /**
-   * 네비게이션을 초기화합니다.
+   * 네비게이션을 초기화합니다. (싱글톤 패턴 + Promise 기반)
    */
   const initialize = async () => {
+    // 이미 초기화 중인 Promise가 있다면 해당 Promise를 반환
+    if (navigatorState.initializationPromise) {
+      logger.log('이미 초기화 진행 중, 기존 Promise 반환');
+      return navigatorState.initializationPromise;
+    }
+
     if (shouldSkipInitialization()) {
-      return;
+      return Promise.resolve();
     }
 
-    navigatorState.isInitializing = true;
-    logger.log('네비게이터 초기화 시작');
+    // 고유한 초기화 ID 생성 (디버깅용)
+    const initId = navigatorState.generateInitId();
+    logger.log(`네비게이터 초기화 시작 (ID: ${initId})`);
 
-    try {
-      await initializeNavigation();
-    } catch (error) {
-      logger.error('네비게이터 초기화 중 오류 발생:', error);
-    } finally {
-      navigatorState.isInitializing = false;
-    }
+    // 새로운 초기화 Promise 생성 및 저장
+    const initPromise = (async () => {
+      navigatorState.isInitializing = true;
+      
+      try {
+        await initializeNavigation();
+        logger.log(`네비게이터 초기화 완료 (ID: ${initId})`);
+      } catch (error) {
+        logger.error(`네비게이터 초기화 중 오류 발생 (ID: ${initId}):`, error);
+        throw error;
+      } finally {
+        navigatorState.isInitializing = false;
+        navigatorState.initializationPromise = null;
+      }
+    })();
+
+    navigatorState.initializationPromise = initPromise;
+    return initPromise;
   };
 
   /**
    * 네비게이터의 활성화 상태를 토글합니다.
    */
-  const toggleNavigator = (enabled: boolean) => {
+  const toggleNavigator = async (enabled: boolean) => {
     navigatorState.isEnabled = enabled;
     navigatorState.reset();
 
@@ -220,7 +274,11 @@ const navigatorManager = (() => {
       navigatorUI.removeExistingNavigation();
     } else {
       logger.log('네비게이터 활성화 중');
-      initialize();
+      try {
+        await initialize();
+      } catch (error) {
+        logger.error('네비게이터 활성화 중 오류:', error);
+      }
     }
   };
 
@@ -251,14 +309,18 @@ chrome.runtime.onMessage.addListener((message: ToggleMessage, sender: chrome.run
 });
 
 // 초기 상태 로드 및 설정
-chrome.storage.local.get(['navigatorEnabled'], (result: StorageResult) => {
+chrome.storage.local.get(['navigatorEnabled'], async (result: StorageResult) => {
   navigatorState.isEnabled = result.navigatorEnabled !== false;
   navigatorState.reset();
 
   logger.log('초기 상태 로드됨:', navigatorState.isEnabled);
 
   if (navigatorState.isEnabled) {
-    navigatorManager.initialize();
+    try {
+      await navigatorManager.initialize();
+    } catch (error) {
+      logger.error('초기 네비게이터 로드 중 오류:', error);
+    }
   } else {
     navigatorUI.removeExistingNavigation();
   }
@@ -290,8 +352,12 @@ chrome.storage.local.get(['navigatorEnabled'], (result: StorageResult) => {
         if (timeout) {
           clearTimeout(timeout);
         }
-        timeout = setTimeout(() => {
-          navigatorManager.initialize();
+        timeout = setTimeout(async () => {
+          try {
+            await navigatorManager.initialize();
+          } catch (error) {
+            logger.error('URL 변경으로 인한 초기화 중 오류:', error);
+          }
           timeout = null;
         }, 1000);
       }
@@ -317,8 +383,12 @@ chrome.storage.local.get(['navigatorEnabled'], (result: StorageResult) => {
 
     if (shouldInit && navigatorState.isEnabled) {
       logger.log('페이지 변경 감지됨, 네비게이터 초기화 예정');
-      timeout = setTimeout(() => {
-        navigatorManager.initialize();
+      timeout = setTimeout(async () => {
+        try {
+          await navigatorManager.initialize();
+        } catch (error) {
+          logger.error('DOM 변경으로 인한 초기화 중 오류:', error);
+        }
         timeout = null;
       }, 1000);
     }
