@@ -3,13 +3,13 @@
  */
 
 /**
- * medium-content 요소 위치를 추적하여 네비게이션 위치 업데이트
+ * medium-criteria 요소 위치를 추적하여 네비게이션 위치 업데이트
  */
 export const updateNavigationPosition = (navigationElement: HTMLElement) => {
-  const mediumContent = document.getElementById('medium-content');
-  if (!mediumContent) return;
+  const mediumCriteria = document.getElementById('medium-criteria');
+  if (!mediumCriteria) return;
 
-  const rect = mediumContent.getBoundingClientRect();
+  const rect = mediumCriteria.getBoundingClientRect();
   const rightPosition = rect.right + 20;
 
   navigationElement.style.left = `${rightPosition}px`;

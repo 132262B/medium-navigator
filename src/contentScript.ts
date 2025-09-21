@@ -1,6 +1,10 @@
 'use strict';
 
-import { isNavigation, findSectionElement, isMedium } from '@/utils/findUtil';
+import {
+  findContentElement,
+  findCriteriaElement,
+  isMedium,
+} from '@/utils/findUtil';
 import { createNavigation } from '@/utils/manipulationUtil';
 import { findTagLocationEvent, footerDetectEvent } from '@/event/visibleEvent';
 import { stateReset } from '@/constants/state';
@@ -134,32 +138,36 @@ const navigatorManager = (() => {
    * 가능한 경우 네비게이션을 생성합니다.
    */
   const createNavigationIfPossible = async () => {
-    logger.log('섹션 요소 찾는 중');
-    
-    let sectionElement = null;
+    logger.log('콘텐츠 및 기준 요소 찾는 중');
+
+    let contentElement = null;
+    let criteriaElement = null;
     let attempts = 0;
     const maxAttempts = 3;
-    
-    while (attempts < maxAttempts && !sectionElement) {
+
+    while (attempts < maxAttempts && (!contentElement || !criteriaElement)) {
       attempts++;
-      logger.log(`섹션 요소 찾기 시도 ${attempts}/${maxAttempts}`);
-      
-      sectionElement = findSectionElement();
-      logger.log(sectionElement);
-      
-      if (!sectionElement && attempts < maxAttempts) {
-        logger.log('섹션 요소를 찾을 수 없음, 1초 후 재시도');
+      logger.log(`요소 찾기 시도 ${attempts}/${maxAttempts}`);
+
+      contentElement = findContentElement();
+      criteriaElement = findCriteriaElement();
+
+      logger.log('콘텐츠 요소:', contentElement);
+      logger.log('기준 요소:', criteriaElement);
+
+      if ((!contentElement || !criteriaElement) && attempts < maxAttempts) {
+        logger.log('요소를 찾을 수 없음, 1초 후 재시도');
         await new Promise(resolve => setTimeout(resolve, 1000));
       }
     }
 
-    if (!sectionElement) {
-      logger.log('모든 시도 후에도 섹션 요소를 찾을 수 없음, 네비게이션 생성 취소');
+    if (!contentElement || !criteriaElement) {
+      logger.log('모든 시도 후에도 필요한 요소를 찾을 수 없음, 네비게이션 생성 취소');
       return;
     }
 
     logger.log('네비게이션 생성 시작');
-    createNavigation(sectionElement);
+    createNavigation(contentElement, criteriaElement);
     logger.log('네비게이션 생성 완료');
   };
 

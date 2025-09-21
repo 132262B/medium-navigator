@@ -3,13 +3,19 @@ import {
   icons,
   LanguageCode,
   navigatorConstants,
+  translationConstants as TC,
 } from '@/constants/constants';
-import { NavigatorContent, state, createNavigatorContent } from '@/constants/state';
+import {
+  createNavigatorContent,
+  NavigatorContent,
+  state,
+} from '@/constants/state';
 import { translateElements } from './translationUtil';
 import { logger } from './logger';
-import { translationConstants as TC } from '@/constants/constants';
-import { updateNavigationPosition, setupPositionObservers } from './navigationPositionManager';
-
+import {
+  setupPositionObservers,
+  updateNavigationPosition,
+} from './navigationPositionManager';
 
 
 /**
@@ -198,12 +204,15 @@ const setupTranslationEvents = (sectionElement: HTMLElement) => {
 /**
  * 네비게이션을 생성하고 설정합니다.
  */
-export const createNavigation = (sectionElement: HTMLElement) => {
-  // 섹션 요소에 ID 부여
-  sectionElement.id = 'medium-content';
+export const createNavigation = (contentElement: HTMLElement, criteriaElement: HTMLElement) => {
+  // 콘텐츠 요소에 ID 부여
+  contentElement.id = 'medium-content';
 
-  // 태그들로부터 네비게이션 컨텐츠 추출
-  const tags = sectionElement.querySelectorAll(navigatorConstants.headingTags);
+  // 기준 요소에 ID 부여 (positioning 용)
+  criteriaElement.id = 'medium-criteria';
+
+  // 콘텐츠 요소의 태그들로부터 네비게이션 컨텐츠 추출
+  const tags = contentElement.querySelectorAll(navigatorConstants.headingTags);
   pushNavigationContent(tags);
 
   // 네비게이션 HTML 생성
@@ -214,10 +223,10 @@ export const createNavigation = (sectionElement: HTMLElement) => {
   // DOM에 추가
   document.body.appendChild(navigationElement);
 
-  // 위치 초기화 및 추적 설정
+  // 위치 초기화 및 추적 설정 (기준 요소 기반)
   updateNavigationPosition(navigationElement);
   setupPositionObservers(navigationElement);
 
-  // 번역 이벤트 설정
-  setupTranslationEvents(sectionElement);
+  // 번역 이벤트 설정 (콘텐츠 요소 기반)
+  setupTranslationEvents(contentElement);
 };

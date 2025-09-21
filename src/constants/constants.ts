@@ -83,5 +83,5 @@ export const translationConstants = {
 };
 
 export const navigatorConstants = {
-  headingTags: 'h1, h2,h3',
+  headingTags: 'h1, h2, h3',
 };

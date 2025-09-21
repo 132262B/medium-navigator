@@ -26,9 +26,14 @@ export const isNavigation = () => {
   return document.getElementsByClassName(classField.navigationClassName).length !== 0;
 };
 
-export const findSectionElement = () => {
+export const findCriteriaElement = () => {
   return document.querySelector('h1.pw-post-title')?.parentElement?.parentElement ?? null;
 };
+
+export const findContentElement = () => {
+  return document.querySelector('section');
+};
+
 
 export const findFooterElement = () => {
   return document.querySelector('footer');
