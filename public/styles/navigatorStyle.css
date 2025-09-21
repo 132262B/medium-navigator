@@ -29,7 +29,11 @@
 }
 
 /* 나머지 스타일은 변경 없음 */
-.medium-navigator-navigation-link-h2 {
+/*.medium-navigator-navigation-link-h2 {*/
+/*  margin-left: 9px;*/
+/*}*/
+
+.medium-navigator-navigation-link-h3 {
   margin-left: 9px;
 }
 
