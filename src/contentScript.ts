@@ -23,42 +23,42 @@ const navigatorState = (() => {
     get isEnabled() {
       return _isEnabled;
     },
-    
+
     /**
      * 활성화 상태 setter
      */
     set isEnabled(value) {
       _isEnabled = value;
     },
-    
+
     /**
      * 초기화 완료 상태 getter
      */
     get isInitialized() {
       return _isInitialized;
     },
-    
+
     /**
      * 초기화 완료 상태 setter
      */
     set isInitialized(value) {
       _isInitialized = value;
     },
-    
+
     /**
      * 초기화 진행 중 상태 getter
      */
     get isInitializing() {
       return _isInitializing;
     },
-    
+
     /**
      * 초기화 진행 중 상태 setter
      */
     set isInitializing(value) {
       _isInitializing = value;
     },
-    
+
     /**
      * 상태 초기화 함수
      */
@@ -79,7 +79,7 @@ const navigatorUI = (() => {
   const removeExistingNavigation = () => {
     logger.log('네비게이션 요소 제거 시도');
     const navigations = document.querySelectorAll(`.${classField.navigationClassName}`);
-    
+
     if (navigations.length === 0) {
       logger.log('제거할 네비게이션 요소 없음');
       return;
@@ -93,7 +93,7 @@ const navigatorUI = (() => {
     });
     logger.log('네비게이션 요소 제거 완료');
   };
-  
+
   return {
     removeExistingNavigation
   };
@@ -135,10 +135,26 @@ const navigatorManager = (() => {
    */
   const createNavigationIfPossible = async () => {
     logger.log('섹션 요소 찾는 중');
-    const sectionElement = findSectionElement();
     
+    let sectionElement = null;
+    let attempts = 0;
+    const maxAttempts = 3;
+    
+    while (attempts < maxAttempts && !sectionElement) {
+      attempts++;
+      logger.log(`섹션 요소 찾기 시도 ${attempts}/${maxAttempts}`);
+      
+      sectionElement = findSectionElement();
+      logger.log(sectionElement);
+      
+      if (!sectionElement && attempts < maxAttempts) {
+        logger.log('섹션 요소를 찾을 수 없음, 1초 후 재시도');
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+    }
+
     if (!sectionElement) {
-      logger.log('섹션 요소를 찾을 수 없음, 네비게이션 생성 취소');
+      logger.log('모든 시도 후에도 섹션 요소를 찾을 수 없음, 네비게이션 생성 취소');
       return;
     }
 
@@ -160,7 +176,7 @@ const navigatorManager = (() => {
 
     setupEvents();
     await createNavigationIfPossible();
-    
+
     navigatorState.isInitialized = true;
   };
 
@@ -219,7 +235,7 @@ interface StorageResult {
 // 메시지 리스너 설정
 chrome.runtime.onMessage.addListener((message: ToggleMessage, sender: chrome.runtime.MessageSender, sendResponse: (response?: any) => void) => {
   logger.log('메시지 수신:', message);
-  
+
   if (message.action === 'toggleNavigator') {
     navigatorManager.toggleNavigator(message.enabled);
     sendResponse?.({ success: true });
@@ -230,9 +246,9 @@ chrome.runtime.onMessage.addListener((message: ToggleMessage, sender: chrome.run
 chrome.storage.local.get(['navigatorEnabled'], (result: StorageResult) => {
   navigatorState.isEnabled = result.navigatorEnabled !== false;
   navigatorState.reset();
-  
+
   logger.log('초기 상태 로드됨:', navigatorState.isEnabled);
-  
+
   if (navigatorState.isEnabled) {
     navigatorManager.initialize();
   } else {
@@ -251,16 +267,16 @@ chrome.storage.local.get(['navigatorEnabled'], (result: StorageResult) => {
     if (currentUrl !== lastUrl) {
       logger.log('URL 변경 감지됨:', lastUrl, '->', currentUrl);
       lastUrl = currentUrl;
-      
+
       // Medium 블로그가 아니면 무시
       if (!isMedium()) {
         logger.log('Medium 블로그가 아님, 네비게이션 초기화 취소');
         return;
       }
-      
+
       // URL 변경 시 상태 초기화 및 네비게이션 재초기화
       navigatorState.reset();
-      
+
       if (navigatorState.isEnabled) {
         logger.log('URL 변경으로 인한 네비게이터 초기화 예정');
         if (timeout) {
@@ -284,9 +300,9 @@ chrome.storage.local.get(['navigatorEnabled'], (result: StorageResult) => {
     // Medium 블로그가 아니면 무시
     if (!isMedium()) return;
 
-    const shouldInit = mutations.some(mutation => 
-      Array.from(mutation.addedNodes).some(node => 
-        node instanceof HTMLElement && 
+    const shouldInit = mutations.some(mutation =>
+      Array.from(mutation.addedNodes).some(node =>
+        node instanceof HTMLElement &&
         (node.tagName === 'ARTICLE' || node.querySelector('article'))
       )
     );
