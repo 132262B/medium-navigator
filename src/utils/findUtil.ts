@@ -27,7 +27,7 @@ export const isNavigation = () => {
 };
 
 export const findSectionElement = () => {
-  return document.querySelector('section');
+  return document.querySelector('h1.pw-post-title')?.parentElement?.parentElement ?? null;
 };
 
 export const findFooterElement = () => {

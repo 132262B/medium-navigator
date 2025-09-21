@@ -13,6 +13,7 @@
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: #9fa8b0 rgba(241, 243, 245, 0);
+  top: calc(30% - 10px);
 }
 
 .medium-navigator-navigation-box::-webkit-scrollbar {
@@ -22,16 +23,8 @@
 @media screen and (min-width: 1280px) {
   .medium-navigator-navigation-box {
     display: block;
-    top: calc(30% - 10px);
-    left: 50%;
-    transform: translateX(390px);
   }
 }
-
-/* 나머지 스타일은 변경 없음 */
-/*.medium-navigator-navigation-link-h2 {*/
-/*  margin-left: 9px;*/
-/*}*/
 
 .medium-navigator-navigation-link-h3 {
   margin-left: 9px;
