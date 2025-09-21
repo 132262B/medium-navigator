@@ -3,8 +3,8 @@
   <h1>Medium Navigator</h1>
   <p>Medium 블로그를 더 쉽고 편리하게 탐색할 수 있는 크롬 확장 프로그램</p>
 
-  ![Version](https://img.shields.io/badge/version-2.0.0-blue)
-  [![Chrome Web Store](https://img.shields.io/badge/Chrome%20Web%20Store-2.0.0-green?logo=google-chrome&logoColor=white)](https://chromewebstore.google.com/detail/medium-navigator/cakgellcgmlfnedjjgfcgikkgpfajfck)
+  ![Version](https://img.shields.io/badge/version-2.0.2-blue)
+  [![Chrome Web Store](https://img.shields.io/badge/Chrome%20Web%20Store-2.0.2-green?logo=google-chrome&logoColor=white)](https://chromewebstore.google.com/detail/medium-navigator/cakgellcgmlfnedjjgfcgikkgpfajfck)
   ![License](https://img.shields.io/badge/License-MIT-blue)
 
 </div>
