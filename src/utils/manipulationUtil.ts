@@ -8,9 +8,13 @@ import { NavigatorContent, state, createNavigatorContent } from '@/constants/sta
 import { translateElements } from './translationUtil';
 import { logger } from './logger';
 import { translationConstants as TC } from '@/constants/constants';
+import { updateNavigationPosition, setupPositionObservers } from './navigationPositionManager';
 
 
 
+/**
+ * 네비게이션 DOM 요소를 생성합니다.
+ */
 const createNavigationElement = (navigationContentElement: string) => {
   const floatingDiv = document.createElement('div');
   floatingDiv.className = classField.navigationClassName;
@@ -18,8 +22,10 @@ const createNavigationElement = (navigationContentElement: string) => {
   return floatingDiv;
 };
 
+/**
+ * 태그들로부터 네비게이션 컨텐츠를 추출하여 state에 저장합니다.
+ */
 const pushNavigationContent = (tags: NodeListOf<Element>) => {
-  // 빈배열로 초기화
   state.contents = [];
 
   tags.forEach(tag => {
@@ -36,6 +42,9 @@ const pushNavigationContent = (tags: NodeListOf<Element>) => {
   });
 };
 
+/**
+ * 네비게이션 링크 목록을 생성합니다.
+ */
 const createNavigationList = (): string => {
   let contents: string = '';
 
@@ -187,86 +196,27 @@ const setupTranslationEvents = (sectionElement: HTMLElement) => {
 };
 
 /**
- * medium-content 요소 위치를 추적하여 네비게이션 위치 업데이트
+ * 네비게이션을 생성하고 설정합니다.
  */
-const updateNavigationPosition = (navigationElement: HTMLElement) => {
-  const mediumContent = document.getElementById('medium-content');
-  if (!mediumContent) return;
-
-  const rect = mediumContent.getBoundingClientRect();
-  const rightPosition = rect.right + 20;
-
-  navigationElement.style.left = `${rightPosition}px`;
-};
-
 export const createNavigation = (sectionElement: HTMLElement) => {
-  const tags: NodeListOf<Element> = sectionElement.querySelectorAll(navigatorConstants.headingTags);
-
-  // sectionElement에 medium-content ID 부여
+  // 섹션 요소에 ID 부여
   sectionElement.id = 'medium-content';
 
-  // tag에서 정보 추출후 state에 추가.
+  // 태그들로부터 네비게이션 컨텐츠 추출
+  const tags = sectionElement.querySelectorAll(navigatorConstants.headingTags);
   pushNavigationContent(tags);
 
-  // state에서 정보를 가져와 element 생성.
-  let contents = createNavigationList();
+  // 네비게이션 HTML 생성
+  const navigationList = createNavigationList();
+  const translationControls = createTranslationControls();
+  const navigationElement = createNavigationElement(translationControls + navigationList);
 
-  // 번역 컨트롤 추가
-  contents = createTranslationControls() + contents;
+  // DOM에 추가
+  document.body.appendChild(navigationElement);
 
-  const newDiv: HTMLDivElement = createNavigationElement(contents);
-
-  // 네비게이션을 body에 직접 추가 (DOM 위치 문제 해결)
-  document.body.appendChild(newDiv);
-
-  // 초기 위치 설정
-  updateNavigationPosition(newDiv);
-
-  // 스크롤과 리사이즈 시 위치 업데이트 (throttle 적용)
-  let ticking = false;
-  const handleUpdate = () => {
-    if (!ticking) {
-      requestAnimationFrame(() => {
-        updateNavigationPosition(newDiv);
-        ticking = false;
-      });
-      ticking = true;
-    }
-  };
-
-  window.addEventListener('scroll', handleUpdate);
-  window.addEventListener('resize', handleUpdate);
-
-  // 특정 요소의 width 변화 감지를 위한 Observer 설정
-  const targetElement = document.evaluate(
-    '//*[@id="root"]/div/div[3]/div[2]/div[1]',
-    document,
-    null,
-    XPathResult.FIRST_ORDERED_NODE_TYPE,
-    null
-  ).singleNodeValue as HTMLElement;
-
-  if (targetElement) {
-    // ResizeObserver로 요소 크기 변화 감지
-    const resizeObserver = new ResizeObserver(() => {
-      handleUpdate();
-    });
-    resizeObserver.observe(targetElement);
-
-    // MutationObserver로 style 속성 변화 감지
-    const mutationObserver = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
-          handleUpdate();
-        }
-      });
-    });
-
-    mutationObserver.observe(targetElement, {
-      attributes: true,
-      attributeFilter: ['style']
-    });
-  }
+  // 위치 초기화 및 추적 설정
+  updateNavigationPosition(navigationElement);
+  setupPositionObservers(navigationElement);
 
   // 번역 이벤트 설정
   setupTranslationEvents(sectionElement);
