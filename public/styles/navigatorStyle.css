@@ -49,17 +49,14 @@
 /* 번역 컨트롤 스타일 */
 .medium-navigator-translation-controls {
   margin-bottom: 8px;
-  padding: 6px;
-  background-color: #f8f9fa;
-  border-radius: 10px;
+  padding: 6px 6px 12px 6px;
   font-size: 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 10px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-  border: 1px solid #eaedf0;
+  border-bottom: 1px solid #F2F2F2;
 }
 
 .medium-navigator-translation-controls select {
@@ -67,8 +64,8 @@
   flex: 1;
   padding: 6px 12px;
   margin-bottom: 0;
-  border: 1px solid #e0e3e9;
-  border-radius: 6px;
+  border: 1px solid rgb(36, 36, 36);
+  border-radius: 24px;
   font-size: 12px;
   min-width: 100px;
   appearance: none;
@@ -79,7 +76,6 @@
   color: #3d4852;
   transition: all 0.2s ease;
   cursor: pointer;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .medium-navigator-translation-controls select:hover {
@@ -99,10 +95,10 @@
 }
 
 .medium-navigator-translation-controls button {
-  background-color: #3366ff;
-  color: white;
-  border: none;
-  border-radius: 6px;
+  background-color: white;
+  color: #333;
+  border: 1px solid rgb(36, 36, 36);
+  border-radius: 24px;
   padding: 6px 12px;
   cursor: pointer;
   font-size: 12px;
@@ -110,7 +106,7 @@
   white-space: nowrap;
   font-weight: 500;
   transition: all 0.2s ease;
-  box-shadow: 0 1px 3px rgba(51, 102, 255, 0.2);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -118,19 +114,20 @@
 }
 
 .medium-navigator-translation-controls button:hover {
-  background-color: #2851d8;
-  transform: translateY(-1px);
-  box-shadow: 0 3px 5px rgba(51, 102, 255, 0.25);
+  background-color: #f9f9f9;
+  border-color: #ddd;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
 .medium-navigator-translation-controls button:active {
-  transform: translateY(0);
-  box-shadow: 0 1px 2px rgba(51, 102, 255, 0.2);
+  background-color: #f0f0f0;
+  border-color: #ccc;
 }
 
 .medium-navigator-translation-controls button:disabled {
-  background-color: #a5b4e8;
+  background-color: #f9f9f9;
+  color: #999;
+  border-color: #e6e6e6;
   cursor: not-allowed;
   box-shadow: none;
-  transform: none;
 }
