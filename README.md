@@ -3,8 +3,8 @@
   <h1>Medium Navigator</h1>
   <p>Medium 블로그를 더 쉽고 편리하게 탐색할 수 있는 크롬 확장 프로그램</p>
 
-  ![Version](https://img.shields.io/badge/version-2.0.0-blue)
-  [![Chrome Web Store](https://img.shields.io/badge/Chrome%20Web%20Store-2.0.0-green?logo=google-chrome&logoColor=white)](https://chromewebstore.google.com/detail/medium-navigator/cakgellcgmlfnedjjgfcgikkgpfajfck)
+  ![Version](https://img.shields.io/badge/version-2.0.2-blue)
+  [![Chrome Web Store](https://img.shields.io/badge/Chrome%20Web%20Store-2.0.2-green?logo=google-chrome&logoColor=white)](https://chromewebstore.google.com/detail/medium-navigator/cakgellcgmlfnedjjgfcgikkgpfajfck)
   ![License](https://img.shields.io/badge/License-MIT-blue)
 
 </div>
@@ -34,6 +34,13 @@
 
 
 ## 업데이트 기록
+
+### 2.0.2
+- 네비게이션에 h3 엘리먼트가 표시되도록 개선했습니다.
+- 네비게이션 링크에서 발생하던 오류를 수정했습니다.
+- 사이드바가 열릴 때 네비게이션이 콘텐츠와 겹치는 문제를 해결했습니다.
+- 간혈적으로 네비게이션이 중복 생성되는 문제를 수정하였습니다.
+- 네비게이션 디자인을 Medium 블로그와 유사하게 변경했습니다.
 
 ### 2.0.1
 - 특정 페이지에서 class name 충돌 문제를 수정

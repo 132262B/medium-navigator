@@ -1,9 +1,26 @@
-import { classField, icons, LanguageCode, languages } from '@/constants/constants';
-import { NavigatorContent, state, createNavigatorContent } from '@/constants/state';
+import {
+  classField,
+  icons,
+  LanguageCode,
+  navigatorConstants,
+  translationConstants as TC,
+} from '@/constants/constants';
+import {
+  createNavigatorContent,
+  NavigatorContent,
+  state,
+} from '@/constants/state';
 import { translateElements } from './translationUtil';
 import { logger } from './logger';
-import { translationConstants as TC } from '@/constants/constants';
+import {
+  setupPositionObservers,
+  updateNavigationPosition,
+} from './navigationPositionManager';
 
+
+/**
+ * 네비게이션 DOM 요소를 생성합니다.
+ */
 const createNavigationElement = (navigationContentElement: string) => {
   const floatingDiv = document.createElement('div');
   floatingDiv.className = classField.navigationClassName;
@@ -11,8 +28,10 @@ const createNavigationElement = (navigationContentElement: string) => {
   return floatingDiv;
 };
 
+/**
+ * 태그들로부터 네비게이션 컨텐츠를 추출하여 state에 저장합니다.
+ */
 const pushNavigationContent = (tags: NodeListOf<Element>) => {
-  // 빈배열로 초기화
   state.contents = [];
 
   tags.forEach(tag => {
@@ -29,12 +48,15 @@ const pushNavigationContent = (tags: NodeListOf<Element>) => {
   });
 };
 
+/**
+ * 네비게이션 링크 목록을 생성합니다.
+ */
 const createNavigationList = (): string => {
   let contents: string = '';
 
   state.contents.forEach((content: NavigatorContent) => {
     contents += `
-        <a id="n-${content.tagId}" href="?#${content.tagId}" class="medium-navigator-navigation-link medium-navigator-navigation-link-${content.tagType.toLowerCase()}">${content.textContent}</a>
+        <a id="n-${content.tagId}" href="#${content.tagId}" class="medium-navigator-navigation-link medium-navigator-navigation-link-${content.tagType.toLowerCase()}">${content.textContent}</a>
         <br>
         `;
   });
@@ -47,7 +69,7 @@ const createNavigationList = (): string => {
  */
 const createTranslationControls = (): string => {
   let optionsHtml = '';
-  
+
   TC.languages.forEach(lang => {
     optionsHtml += `<option value="${lang.code}">${lang.name}</option>`;
   });
@@ -89,23 +111,23 @@ const setupTranslationEvents = (sectionElement: HTMLElement) => {
   const translateButton = document.getElementById('translate-content') as HTMLButtonElement;
   const resetButton = document.getElementById('reset-translation') as HTMLButtonElement;
   const languageSelect = document.getElementById('target-language') as HTMLSelectElement;
-  
+
   if (!translateButton || !resetButton || !languageSelect) return;
-  
+
   // 번역 버튼 클릭 이벤트
   translateButton.addEventListener('click', async () => {
     const targetLang = languageSelect.value as LanguageCode;
-    
+
     // 로딩 상태 표시
     translateButton.textContent = TC.buttonText.translating;
     translateButton.disabled = true;
-    
+
     try {
       // 번역 수행
       await translateElements(sectionElement, TC.selectors.translatable, targetLang);
-      
+
       // 번역된 태그에서 정보 다시 가져와서 네비게이션 항목 업데이트
-      const tags: NodeListOf<Element> = sectionElement.querySelectorAll('h1, h2');
+      const tags: NodeListOf<Element> = sectionElement.querySelectorAll(navigatorConstants.headingTags);
       state.contents.forEach((content, index) => {
         const tag = Array.from(tags).find(t => t.id === content.tagId);
         if (tag && tag.hasAttribute(TC.attributes.translated)) {
@@ -113,7 +135,7 @@ const setupTranslationEvents = (sectionElement: HTMLElement) => {
           content.textContent = tag.textContent || content.textContent;
         }
       });
-      
+
       // 네비게이션 항목 업데이트
       const navLinks = document.querySelectorAll<HTMLElement>(TC.selectors.navigation);
       navLinks.forEach(link => {
@@ -125,7 +147,7 @@ const setupTranslationEvents = (sectionElement: HTMLElement) => {
           }
         }
       });
-      
+
       // 상태 변경
       translateButton.style.display = 'none';
       resetButton.style.display = 'inline-block';
@@ -136,7 +158,7 @@ const setupTranslationEvents = (sectionElement: HTMLElement) => {
       translateButton.disabled = false;
     }
   });
-  
+
   // 원문 보기 버튼 클릭 이벤트
   resetButton.addEventListener('click', () => {
     // 번역된 요소 복원
@@ -149,9 +171,9 @@ const setupTranslationEvents = (sectionElement: HTMLElement) => {
         element.removeAttribute(TC.attributes.originalHtml);
       }
     });
-    
+
     // 원본 태그에서 정보 다시 가져와서 네비게이션 항목 업데이트
-    const tags: NodeListOf<Element> = sectionElement.querySelectorAll('h1, h2');
+    const tags: NodeListOf<Element> = sectionElement.querySelectorAll(navigatorConstants.headingTags);
     state.contents.forEach((content, index) => {
       const tag = Array.from(tags).find(t => t.id === content.tagId);
       if (tag) {
@@ -159,7 +181,7 @@ const setupTranslationEvents = (sectionElement: HTMLElement) => {
         content.textContent = tag.textContent || content.textContent;
       }
     });
-    
+
     // 네비게이션 항목 복원
     const navLinks = document.querySelectorAll<HTMLElement>(TC.selectors.navigation);
     navLinks.forEach(link => {
@@ -171,7 +193,7 @@ const setupTranslationEvents = (sectionElement: HTMLElement) => {
         }
       }
     });
-    
+
     // 상태 변경
     resetButton.style.display = 'none';
     translateButton.style.display = 'inline-block';
@@ -179,21 +201,32 @@ const setupTranslationEvents = (sectionElement: HTMLElement) => {
   });
 };
 
-export const createNavigation = (sectionElement: HTMLElement) => {
-  const tags: NodeListOf<Element> = sectionElement.querySelectorAll('h1, h2');
+/**
+ * 네비게이션을 생성하고 설정합니다.
+ */
+export const createNavigation = (contentElement: HTMLElement, criteriaElement: HTMLElement) => {
+  // 콘텐츠 요소에 ID 부여
+  contentElement.id = 'medium-content';
 
-  // tag에서 정보 추출후 state에 추가.
+  // 기준 요소에 ID 부여 (positioning 용)
+  criteriaElement.id = 'medium-criteria';
+
+  // 콘텐츠 요소의 태그들로부터 네비게이션 컨텐츠 추출
+  const tags = contentElement.querySelectorAll(navigatorConstants.headingTags);
   pushNavigationContent(tags);
 
-  // state에서 정보를 가져와 element 생성.
-  let contents = createNavigationList();
+  // 네비게이션 HTML 생성
+  const navigationList = createNavigationList();
+  const translationControls = createTranslationControls();
+  const navigationElement = createNavigationElement(translationControls + navigationList);
 
-  // 번역 컨트롤 추가
-  contents = createTranslationControls() + contents;
+  // DOM에 추가
+  document.body.appendChild(navigationElement);
 
-  const newDiv: HTMLDivElement = createNavigationElement(contents);
-  sectionElement.parentElement?.appendChild(newDiv);
+  // 위치 초기화 및 추적 설정 (기준 요소 기반)
+  updateNavigationPosition(navigationElement);
+  setupPositionObservers(navigationElement);
 
-  // 번역 이벤트 설정
-  setupTranslationEvents(sectionElement);
+  // 번역 이벤트 설정 (콘텐츠 요소 기반)
+  setupTranslationEvents(contentElement);
 };

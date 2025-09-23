@@ -1,6 +1,6 @@
 {
   "name": "medium-navigator",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "A navigation extension that makes exploring Medium blogs effortless.",
   "private": true,
   "scripts": {
@@ -17,7 +17,7 @@
     "css-loader": "^6.9.1",
     "file-loader": "^6.2.0",
     "mini-css-extract-plugin": "^2.7.7",
-    "prettier": "^2.8.8",
+    "prettier": "^3.6.2",
     "ts-loader": "^9.5.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3",
