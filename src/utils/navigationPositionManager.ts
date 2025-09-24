@@ -57,7 +57,10 @@ export const setupPositionObservers = (
     // MutationObserver로 style 속성 변화 감지
     const mutationObserver = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
-        if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+        if (
+          mutation.type === 'attributes' &&
+          mutation.attributeName === 'style'
+        ) {
           handleUpdate();
         }
       });
@@ -65,7 +68,7 @@ export const setupPositionObservers = (
 
     mutationObserver.observe(targetElement, {
       attributes: true,
-      attributeFilter: ['style']
+      attributeFilter: ['style'],
     });
 
     // 정리 함수 반환

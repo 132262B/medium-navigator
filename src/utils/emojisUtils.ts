@@ -1,4 +1,4 @@
-import { space, translationConstants as TC } from "@/constants/constants";
+import { space, translationConstants as TC } from '@/constants/constants';
 
 /**
  * 특정 문자가 이모지인지 확인합니다.
@@ -18,15 +18,15 @@ export const isCombiningChar = (char: string): boolean => {
   const code = char.codePointAt(0) || 0;
   return (
     // 이모지 표현 방식 선택자 (Variation Selectors)
-    (code >= 0xFE00 && code <= 0xFE0F) ||
+    (code >= 0xfe00 && code <= 0xfe0f) ||
     // 이모지 수식어 (Emoji Modifiers)
-    (code >= 0x1F3FB && code <= 0x1F3FF) ||
+    (code >= 0x1f3fb && code <= 0x1f3ff) ||
     // 결합 문자 (Combining Characters)
-    (code >= 0x20D0 && code <= 0x20FF) ||
+    (code >= 0x20d0 && code <= 0x20ff) ||
     // keycap 시퀀스 종료자
-    code === 0x20E3 ||
+    code === 0x20e3 ||
     // Zero Width Joiner
-    code === 0x200D
+    code === 0x200d
   );
 };
 
@@ -36,17 +36,20 @@ export const isCombiningChar = (char: string): boolean => {
  * @param startIndex 검사 시작 위치
  * @returns 이모지 시퀀스 정보 또는 null
  */
-export const findEmojiSequence = (str: string, startIndex: number): { emoji: string; endIndex: number } | null => {
+export const findEmojiSequence = (
+  str: string,
+  startIndex: number
+): { emoji: string; endIndex: number } | null => {
   // 현재 위치에 이모지가 없으면 null 반환
   const firstChar = str.charAt(startIndex);
   if (!isEmojiChar(firstChar)) {
     return null;
   }
-  
+
   // 연속된 이모지 문자를 찾아서 하나의 시퀀스로 처리
   let endIndex = startIndex;
   let currentEmoji = firstChar;
-  
+
   // 다음 문자가 이모지 또는 조합 문자인 경우 계속 진행
   for (let i = startIndex + 1; i < str.length; i++) {
     const char = str.charAt(i);
@@ -57,7 +60,7 @@ export const findEmojiSequence = (str: string, startIndex: number): { emoji: str
       break;
     }
   }
-  
+
   return { emoji: currentEmoji, endIndex };
 };
 
@@ -69,11 +72,11 @@ export const findEmojiSequence = (str: string, startIndex: number): { emoji: str
 export const protectEmojis = (text: string): string => {
   let result = '';
   let i = 0;
-  
+
   while (i < text.length) {
     // 현재 위치에서 이모지 시퀀스 찾기
     const emojiSequence = findEmojiSequence(text, i);
-    
+
     if (emojiSequence) {
       // 이모지 시퀀스를 notranslate로 감싸기
       result += `<span class="${TC.classNames.noTranslate}">${emojiSequence.emoji}${space}</span>`;
@@ -84,6 +87,6 @@ export const protectEmojis = (text: string): string => {
       i++;
     }
   }
-  
+
   return result;
-}; 
+};

@@ -17,7 +17,6 @@ import {
   updateNavigationPosition,
 } from './navigationPositionManager';
 
-
 /**
  * 네비게이션 DOM 요소를 생성합니다.
  */
@@ -34,15 +33,15 @@ const createNavigationElement = (navigationContentElement: string) => {
 const pushNavigationContent = (tags: NodeListOf<Element>) => {
   state.contents = [];
 
-  tags.forEach(tag => {
+  tags.forEach((tag) => {
     if (tag.id) {
       state.contents.push(
         createNavigatorContent(
           tag.id,
           tag.tagName.toLowerCase(),
           tag.textContent,
-          tag.getBoundingClientRect().top + window.scrollY,
-        ),
+          tag.getBoundingClientRect().top + window.scrollY
+        )
       );
     }
   });
@@ -70,7 +69,7 @@ const createNavigationList = (): string => {
 const createTranslationControls = (): string => {
   let optionsHtml = '';
 
-  TC.languages.forEach(lang => {
+  TC.languages.forEach((lang) => {
     optionsHtml += `<option value="${lang.code}">${lang.name}</option>`;
   });
 
@@ -105,12 +104,43 @@ const extractIdFromHref = (href: string | null): string => {
 };
 
 /**
+ * 네비게이션 링크에 부드러운 스크롤링을 위한 이벤트 리스너를 설정합니다.
+ */
+const setupNavigationLinkEvents = () => {
+  const navLinks = document.querySelectorAll<HTMLAnchorElement>(
+    TC.selectors.navigation
+  );
+
+  navLinks.forEach((link) => {
+    link.addEventListener('click', (event) => {
+      event.preventDefault(); // URL 해시 변경 방지
+
+      const targetId = extractIdFromHref(link.getAttribute('href'));
+      const targetElement = document.getElementById(targetId);
+
+      if (targetElement) {
+        targetElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }
+    });
+  });
+};
+
+/**
  * 번역 동작을 위한 이벤트 리스너를 설정합니다.
  */
 const setupTranslationEvents = (sectionElement: HTMLElement) => {
-  const translateButton = document.getElementById('translate-content') as HTMLButtonElement;
-  const resetButton = document.getElementById('reset-translation') as HTMLButtonElement;
-  const languageSelect = document.getElementById('target-language') as HTMLSelectElement;
+  const translateButton = document.getElementById(
+    'translate-content'
+  ) as HTMLButtonElement;
+  const resetButton = document.getElementById(
+    'reset-translation'
+  ) as HTMLButtonElement;
+  const languageSelect = document.getElementById(
+    'target-language'
+  ) as HTMLSelectElement;
 
   if (!translateButton || !resetButton || !languageSelect) return;
 
@@ -124,12 +154,18 @@ const setupTranslationEvents = (sectionElement: HTMLElement) => {
 
     try {
       // 번역 수행
-      await translateElements(sectionElement, TC.selectors.translatable, targetLang);
+      await translateElements(
+        sectionElement,
+        TC.selectors.translatable,
+        targetLang
+      );
 
       // 번역된 태그에서 정보 다시 가져와서 네비게이션 항목 업데이트
-      const tags: NodeListOf<Element> = sectionElement.querySelectorAll(navigatorConstants.headingTags);
+      const tags: NodeListOf<Element> = sectionElement.querySelectorAll(
+        navigatorConstants.headingTags
+      );
       state.contents.forEach((content, index) => {
-        const tag = Array.from(tags).find(t => t.id === content.tagId);
+        const tag = Array.from(tags).find((t) => t.id === content.tagId);
         if (tag && tag.hasAttribute(TC.attributes.translated)) {
           // 번역된 텍스트로 상태 업데이트
           content.textContent = tag.textContent || content.textContent;
@@ -137,11 +173,15 @@ const setupTranslationEvents = (sectionElement: HTMLElement) => {
       });
 
       // 네비게이션 항목 업데이트
-      const navLinks = document.querySelectorAll<HTMLElement>(TC.selectors.navigation);
-      navLinks.forEach(link => {
+      const navLinks = document.querySelectorAll<HTMLElement>(
+        TC.selectors.navigation
+      );
+      navLinks.forEach((link) => {
         const elementId = extractIdFromHref(link.getAttribute('href'));
         if (elementId) {
-          const contentItem = state.contents.find(content => content.tagId === elementId);
+          const contentItem = state.contents.find(
+            (content) => content.tagId === elementId
+          );
           if (contentItem) {
             link.innerText = contentItem.textContent || '';
           }
@@ -162,8 +202,10 @@ const setupTranslationEvents = (sectionElement: HTMLElement) => {
   // 원문 보기 버튼 클릭 이벤트
   resetButton.addEventListener('click', () => {
     // 번역된 요소 복원
-    const translatedElements = sectionElement.querySelectorAll(`[${TC.attributes.translated}="${TC.attributes.valueTrue}"]`);
-    translatedElements.forEach(element => {
+    const translatedElements = sectionElement.querySelectorAll(
+      `[${TC.attributes.translated}="${TC.attributes.valueTrue}"]`
+    );
+    translatedElements.forEach((element) => {
       const originalHtml = element.getAttribute(TC.attributes.originalHtml);
       if (originalHtml) {
         (element as HTMLElement).innerHTML = originalHtml;
@@ -173,9 +215,11 @@ const setupTranslationEvents = (sectionElement: HTMLElement) => {
     });
 
     // 원본 태그에서 정보 다시 가져와서 네비게이션 항목 업데이트
-    const tags: NodeListOf<Element> = sectionElement.querySelectorAll(navigatorConstants.headingTags);
+    const tags: NodeListOf<Element> = sectionElement.querySelectorAll(
+      navigatorConstants.headingTags
+    );
     state.contents.forEach((content, index) => {
-      const tag = Array.from(tags).find(t => t.id === content.tagId);
+      const tag = Array.from(tags).find((t) => t.id === content.tagId);
       if (tag) {
         // 원본 텍스트로 상태 업데이트
         content.textContent = tag.textContent || content.textContent;
@@ -183,11 +227,15 @@ const setupTranslationEvents = (sectionElement: HTMLElement) => {
     });
 
     // 네비게이션 항목 복원
-    const navLinks = document.querySelectorAll<HTMLElement>(TC.selectors.navigation);
-    navLinks.forEach(link => {
+    const navLinks = document.querySelectorAll<HTMLElement>(
+      TC.selectors.navigation
+    );
+    navLinks.forEach((link) => {
       const elementId = extractIdFromHref(link.getAttribute('href'));
       if (elementId) {
-        const contentItem = state.contents.find(content => content.tagId === elementId);
+        const contentItem = state.contents.find(
+          (content) => content.tagId === elementId
+        );
         if (contentItem) {
           link.innerText = contentItem.textContent || '';
         }
@@ -204,7 +252,10 @@ const setupTranslationEvents = (sectionElement: HTMLElement) => {
 /**
  * 네비게이션을 생성하고 설정합니다.
  */
-export const createNavigation = (contentElement: HTMLElement, criteriaElement: HTMLElement) => {
+export const createNavigation = (
+  contentElement: HTMLElement,
+  criteriaElement: HTMLElement
+) => {
   // 콘텐츠 요소에 ID 부여
   contentElement.id = 'medium-content';
 
@@ -218,7 +269,9 @@ export const createNavigation = (contentElement: HTMLElement, criteriaElement: H
   // 네비게이션 HTML 생성
   const navigationList = createNavigationList();
   const translationControls = createTranslationControls();
-  const navigationElement = createNavigationElement(translationControls + navigationList);
+  const navigationElement = createNavigationElement(
+    translationControls + navigationList
+  );
 
   // DOM에 추가
   document.body.appendChild(navigationElement);
@@ -229,4 +282,7 @@ export const createNavigation = (contentElement: HTMLElement, criteriaElement: H
 
   // 번역 이벤트 설정 (콘텐츠 요소 기반)
   setupTranslationEvents(contentElement);
+
+  // 네비게이션 링크 이벤트 설정
+  setupNavigationLinkEvents();
 };

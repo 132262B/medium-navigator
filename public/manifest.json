@@ -23,23 +23,15 @@
   },
   "content_scripts": [
     {
-      "matches": [
-        "<all_urls>"
-      ],
+      "matches": ["<all_urls>"],
       "exclude_matches": [
         "https://medium.com/new-story",
         "https://medium.com/p/*/edit"
       ],
-      "js": [
-        "contentScript.js"
-      ],
-      "css": [
-        "styles/navigatorStyle.css"
-      ],
+      "js": ["contentScript.js"],
+      "css": ["styles/navigatorStyle.css"],
       "run_at": "document_idle"
     }
   ],
-  "permissions": [
-    "storage"
-  ]
+  "permissions": ["storage"]
 }

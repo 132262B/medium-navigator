@@ -63,7 +63,8 @@ export const translationConstants = {
   excludedTags: ['a', 'script', 'style', 'code', 'pre'],
 
   // 이모지 정규식 패턴 (복합 이모지도 하나의 단위로 처리)
-  emojiRegex: /([\u{1F300}-\u{1F6FF}]|[\u{1F900}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F100}-\u{1F1FF}]|[\u{1F1E6}-\u{1F1FF}]|[\u{1F300}-\u{1F5FF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]|[\u{2600}-\u{26FF}]|\u{200D}|[\u{2700}-\u{27BF}]|\u{FE0F}|\u{20E3}|[\u{1F000}-\u{1F3FF}])/gu,
+  emojiRegex:
+    /([\u{1F300}-\u{1F6FF}]|[\u{1F900}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F100}-\u{1F1FF}]|[\u{1F1E6}-\u{1F1FF}]|[\u{1F300}-\u{1F5FF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]|[\u{2600}-\u{26FF}]|\u{200D}|[\u{2700}-\u{27BF}]|\u{FE0F}|\u{20E3}|[\u{1F000}-\u{1F3FF}])/gu,
 
   // 번역 API 설정
   api: {
@@ -84,4 +85,27 @@ export const translationConstants = {
 
 export const navigatorConstants = {
   headingTags: 'h1, h2, h3',
+  domReady: {
+    maxAttempts: 3,
+    retryDelayMs: 1000,
+  },
+  timing: {
+    urlChangeDelayMs: 1000,
+    urlCheckIntervalMs: 1000,
+    domChangeDelayMs: 1000,
+  },
+  selectors: {
+    mediumMetaTags: [
+      'meta[property="og:site_name"]',
+      'meta[name="twitter:app:name:iphone"]',
+      'meta[property="al:ios:app_name"]',
+      'meta[property="al:android:app_name"]',
+    ],
+    mediumTitle: 'h1.pw-post-title',
+    section: 'section',
+    footer: 'footer',
+  },
+  urls: {
+    excludePatterns: ['/new-story', '/p/', '/edit'],
+  },
 };

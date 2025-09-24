@@ -9,7 +9,7 @@ import { createNavigation } from '@/utils/manipulationUtil';
 import { findTagLocationEvent, footerDetectEvent } from '@/event/visibleEvent';
 import { stateReset } from '@/constants/state';
 import { logger } from './utils/logger';
-import { classField } from './constants/constants';
+import { classField, navigatorConstants } from './constants/constants';
 
 /**
  * 네비게이터 상태 관리 모듈 (강화된 중복 방지 로직)
@@ -99,8 +99,10 @@ const navigatorState = (() => {
      * 초기화 가능 여부 체크 (더 강력한 검증)
      */
     canInitialize() {
-      return !_isInitializing && !_isInitialized && _initializationPromise === null;
-    }
+      return (
+        !_isInitializing && !_isInitialized && _initializationPromise === null
+      );
+    },
   };
 })();
 
@@ -113,7 +115,9 @@ const navigatorUI = (() => {
    */
   const removeExistingNavigation = () => {
     logger.log('네비게이션 요소 제거 시도');
-    const navigations = document.querySelectorAll(`.${classField.navigationClassName}`);
+    const navigations = document.querySelectorAll(
+      `.${classField.navigationClassName}`
+    );
 
     if (navigations.length === 0) {
       logger.log('제거할 네비게이션 요소 없음');
@@ -121,7 +125,7 @@ const navigatorUI = (() => {
     }
 
     logger.log(`${navigations.length}개의 네비게이션 요소 제거`);
-    navigations.forEach(nav => {
+    navigations.forEach((nav) => {
       if (nav?.parentNode) {
         nav.parentNode.removeChild(nav);
       }
@@ -130,7 +134,7 @@ const navigatorUI = (() => {
   };
 
   return {
-    removeExistingNavigation
+    removeExistingNavigation,
   };
 })();
 
@@ -179,7 +183,7 @@ const navigatorManager = (() => {
     let contentElement = null;
     let criteriaElement = null;
     let attempts = 0;
-    const maxAttempts = 3;
+    const { maxAttempts, retryDelayMs } = navigatorConstants.domReady;
 
     while (attempts < maxAttempts && (!contentElement || !criteriaElement)) {
       attempts++;
@@ -192,13 +196,15 @@ const navigatorManager = (() => {
       logger.log('기준 요소:', criteriaElement);
 
       if ((!contentElement || !criteriaElement) && attempts < maxAttempts) {
-        logger.log('요소를 찾을 수 없음, 1초 후 재시도');
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        logger.log(`요소를 찾을 수 없음, ${retryDelayMs}ms 후 재시도`);
+        await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
       }
     }
 
     if (!contentElement || !criteriaElement) {
-      logger.log('모든 시도 후에도 필요한 요소를 찾을 수 없음, 네비게이션 생성 취소');
+      logger.log(
+        '모든 시도 후에도 필요한 요소를 찾을 수 없음, 네비게이션 생성 취소'
+      );
       return;
     }
 
@@ -245,7 +251,7 @@ const navigatorManager = (() => {
     // 새로운 초기화 Promise 생성 및 저장
     const initPromise = (async () => {
       navigatorState.isInitializing = true;
-      
+
       try {
         await initializeNavigation();
         logger.log(`네비게이터 초기화 완료 (ID: ${initId})`);
@@ -284,7 +290,7 @@ const navigatorManager = (() => {
 
   return {
     initialize,
-    toggleNavigator
+    toggleNavigator,
   };
 })();
 
@@ -299,32 +305,41 @@ interface StorageResult {
 }
 
 // 메시지 리스너 설정
-chrome.runtime.onMessage.addListener((message: ToggleMessage, sender: chrome.runtime.MessageSender, sendResponse: (response?: any) => void) => {
-  logger.log('메시지 수신:', message);
+chrome.runtime.onMessage.addListener(
+  (
+    message: ToggleMessage,
+    sender: chrome.runtime.MessageSender,
+    sendResponse: (response?: any) => void
+  ) => {
+    logger.log('메시지 수신:', message);
 
-  if (message.action === 'toggleNavigator') {
-    navigatorManager.toggleNavigator(message.enabled);
-    sendResponse?.({ success: true });
+    if (message.action === 'toggleNavigator') {
+      navigatorManager.toggleNavigator(message.enabled);
+      sendResponse?.({ success: true });
+    }
   }
-});
+);
 
 // 초기 상태 로드 및 설정
-chrome.storage.local.get(['navigatorEnabled'], async (result: StorageResult) => {
-  navigatorState.isEnabled = result.navigatorEnabled !== false;
-  navigatorState.reset();
+chrome.storage.local.get(
+  ['navigatorEnabled'],
+  async (result: StorageResult) => {
+    navigatorState.isEnabled = result.navigatorEnabled !== false;
+    navigatorState.reset();
 
-  logger.log('초기 상태 로드됨:', navigatorState.isEnabled);
+    logger.log('초기 상태 로드됨:', navigatorState.isEnabled);
 
-  if (navigatorState.isEnabled) {
-    try {
-      await navigatorManager.initialize();
-    } catch (error) {
-      logger.error('초기 네비게이터 로드 중 오류:', error);
+    if (navigatorState.isEnabled) {
+      try {
+        await navigatorManager.initialize();
+      } catch (error) {
+        logger.error('초기 네비게이터 로드 중 오류:', error);
+      }
+    } else {
+      navigatorUI.removeExistingNavigation();
     }
-  } else {
-    navigatorUI.removeExistingNavigation();
   }
-});
+);
 
 // 페이지 변경 감지 및 자동 초기화
 (() => {
@@ -359,25 +374,31 @@ chrome.storage.local.get(['navigatorEnabled'], async (result: StorageResult) => 
             logger.error('URL 변경으로 인한 초기화 중 오류:', error);
           }
           timeout = null;
-        }, 1000);
+        }, navigatorConstants.timing.urlChangeDelayMs);
       }
     }
   };
 
   // 주기적으로 URL 변경 확인
-  setInterval(checkUrlChange, 1000);
+  setInterval(checkUrlChange, navigatorConstants.timing.urlCheckIntervalMs);
 
   // DOM 변경 감지
-  const observer = new MutationObserver(mutations => {
-    if (timeout || navigatorState.isInitializing || navigatorState.isInitialized) return;
+  const observer = new MutationObserver((mutations) => {
+    if (
+      timeout ||
+      navigatorState.isInitializing ||
+      navigatorState.isInitialized
+    )
+      return;
 
     // Medium 블로그가 아니면 무시
     if (!isMedium()) return;
 
-    const shouldInit = mutations.some(mutation =>
-      Array.from(mutation.addedNodes).some(node =>
-        node instanceof HTMLElement &&
-        (node.tagName === 'ARTICLE' || node.querySelector('article'))
+    const shouldInit = mutations.some((mutation) =>
+      Array.from(mutation.addedNodes).some(
+        (node) =>
+          node instanceof HTMLElement &&
+          (node.tagName === 'ARTICLE' || node.querySelector('article'))
       )
     );
 
@@ -390,7 +411,7 @@ chrome.storage.local.get(['navigatorEnabled'], async (result: StorageResult) => 
           logger.error('DOM 변경으로 인한 초기화 중 오류:', error);
         }
         timeout = null;
-      }, 1000);
+      }, navigatorConstants.timing.domChangeDelayMs);
     }
   });
 

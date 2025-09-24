@@ -1,7 +1,7 @@
 :root {
   /* Border colors */
   --border-light: #f1f3f5;
-  --border-neutral: #6B6B6B;
+  --border-neutral: #6b6b6b;
   --border-disabled: #e6e6e6;
   --border-active: #ccc;
 
@@ -11,7 +11,7 @@
   --text-dark: #333;
   --text-muted: #3d4852;
   --text-disabled: #999;
-  --text-neutral: #6B6B6B;
+  --text-neutral: #6b6b6b;
 
   /* Background colors */
   --bg-white: white;
@@ -66,7 +66,9 @@
   display: block;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.5s ease, visibility 0s 0.5s;
+  transition:
+    opacity 0.5s ease,
+    visibility 0s 0.5s;
 }
 
 .medium-navigator-active-tag {
@@ -84,7 +86,7 @@
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 10px;
-  border-bottom: 1px solid #F2F2F2;
+  border-bottom: 1px solid #f2f2f2;
 }
 
 .medium-navigator-translation-controls select {

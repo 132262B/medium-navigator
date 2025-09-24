@@ -19,15 +19,15 @@ export interface NavigatorContent {
  * NavigatorContent 객체를 생성하는 팩토리 함수
  */
 export const createNavigatorContent = (
-  tagId: string, 
-  tagType: string, 
-  textContent: string | null, 
+  tagId: string,
+  tagType: string,
+  textContent: string | null,
   scrollPosition: number
 ): NavigatorContent => ({
   tagId,
   tagType,
   textContent,
-  scrollPosition
+  scrollPosition,
 });
 
 export const stateReset = (): void => {
