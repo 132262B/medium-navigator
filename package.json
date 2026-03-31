@@ -13,7 +13,7 @@
   "devDependencies": {
     "@types/chrome": "^0.0.313",
     "adm-zip": "^0.5.10",
-    "copy-webpack-plugin": "^10.2.4",
+    "copy-webpack-plugin": "^14.0.0",
     "css-loader": "^6.9.1",
     "file-loader": "^6.2.0",
     "mini-css-extract-plugin": "^2.7.7",
